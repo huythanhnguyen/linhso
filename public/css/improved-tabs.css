@@ -1,0 +1,184 @@
+/* CSS nâng cao cho tabs và nút đóng */
+
+/* Cải thiện header của info panel */
+.info-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.info-panel-header h3 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Nút đóng cải tiến */
+.close-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+}
+
+.close-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.close-button:active {
+    transform: rotate(90deg) scale(0.9);
+}
+
+/* Tạo hiệu ứng X đẹp hơn */
+.close-button i {
+    font-size: 16px;
+}
+
+/* Cải thiện tabs */
+.info-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    background-color: white;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.info-tab-button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng phát sáng khi hover */
+.info-tab-button:hover:not(.active) {
+    background-color: rgba(0, 0, 0, 0.02);
+    color: var(--primary-color);
+}
+
+/* Tab active với underline animation */
+.info-tab-button.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.info-tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-color);
+    animation: slideRight 0.3s ease-out forwards;
+}
+
+@keyframes slideRight {
+    from { transform: scaleX(0); transform-origin: left; }
+    to { transform: scaleX(1); transform-origin: left; }
+}
+
+/* Hiệu ứng khi click vào tab */
+.info-tab-button:active {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Hiệu ứng ripple khi click */
+.info-tab-button .ripple {
+    position: absolute;
+    background: rgba(var(--primary-color-rgb), 0.2);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+/* Hiệu ứng xuất hiện cho nội dung tab */
+.info-tab-content.active {
+    animation: fadeIn 0.3s ease-out, slideUp 0.3s ease-out;
+}
+
+/* Cải thiện phần content */
+.info-tab-content {
+    padding: 16px;
+    max-height: 60vh;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+/* Thanh cuộn tùy chỉnh */
+.info-tab-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.info-tab-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 10px;
+}
+
+.info-tab-content::-webkit-scrollbar-thumb {
+    background: rgba(var(--primary-color-rgb), 0.2);
+    border-radius: 10px;
+}
+
+.info-tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* Script để thêm hiệu ứng Ripple */
+/* Thêm đoạn mã JavaScript này vào file JS của bạn */
+/*
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.info-tab-button');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            this.appendChild(ripple);
+            
+            const x = e.clientX - e.target.getBoundingClientRect().left;
+            const y = e.clientY - e.target.getBoundingClientRect().top;
+            
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+});
+*/

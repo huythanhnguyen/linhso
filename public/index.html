@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân Tích Số Điện Thoại</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link rel="stylesheet" href="css/analysis.css">
+    <link rel="stylesheet" href="css/improved-tabs.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Style để ẩn tất cả container khi trang vừa tải */
+        #auth-container, #app-container {
+            display: none;
+        }
+        
+        /* Thêm màn hình loading hiển thị khi trang đang tải */
+        #loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--background-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Thêm CSS cho tổ hợp sao */
+        .star-combinations-section {
+            margin-bottom: 16px;
+        }
+        
+        .star-combinations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .star-combo-item {
+            background-color: #f9f9fa;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        
+        .star-combo-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .star-combo-header .star-name {
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.9rem;
+        }
+        
+        .star-combo-header .star-name.auspicious {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+        
+        .star-combo-header .star-name.inauspicious {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+        
+        .combo-plus {
+            margin: 0 5px;
+            color: #666;
+        }
+        
+        .star-combo-desc {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        /* CSS cho modal chi tiết */
+        .modal-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-container.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header chính -->
+    <header>
+        <div class="container">
+            <h2>Phân Tích Số Điện Thoại</h2>
+            <p>Tìm hiểu ý nghĩa số của bạn theo phương pháp Tứ Cát Tứ Hung</p>
+        </div>
+    </header>
+
+    <!-- Màn hình loading hiển thị khi trang đang tải -->
+    <div id="loading-container">
+        <div class="spinner"></div>
+    </div>
+
+    <main class="container">
+        <!-- Phần đăng nhập -->
+        <div id="auth-container" class="auth-container">
+            <div class="auth-box">
+                <div class="auth-header">
+                    <h3>Đăng Nhập</h3>
+                    <div class="auth-toggle">
+                        <button class="auth-tab active" data-tab="login">Đăng Nhập</button>
+                        <button class="auth-tab" data-tab="register">Đăng Ký</button>
+                    </div>
+                </div>
+                
+                <!-- Form đăng nhập -->
+                <div class="auth-form active" id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="Email của bạn">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Mật khẩu</label>
+                        <input type="password" id="login-password" placeholder="Mật khẩu">
+                    </div>
+                    <div class="form-action">
+                        <button id="login-btn" class="btn-primary">Đăng Nhập</button>
+                    </div>
+                    <div class="auth-message" id="login-message"></div>
+                </div>
+
+                <!-- Form đăng ký -->
+                <div class="auth-form" id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">Họ tên</label>
+                        <input type="text" id="register-name" placeholder="Họ tên của bạn">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" placeholder="Email của bạn">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Mật khẩu</label>
+                        <input type="password" id="register-password" placeholder="Mật khẩu (ít nhất 6 ký tự)">
+                    </div>
+                    <div class="form-action">
+                        <button id="register-btn" class="btn-primary">Đăng Ký</button>
+                    </div>
+                    <div class="auth-message" id="register-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phần ứng dụng chính -->
+        <div id="app-container" class="app-container">
+            <div class="user-header">
+                <div class="user-info">
+                    <span id="user-name">Xin chào, nguyen huy thanh</span>
+                </div>
+                <button id="logout-btn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                </button>
+            </div>
+
+            <div class="main-content">
+                <!-- Panel phân tích số điện thoại - Phần trọng tâm -->
+                <div class="chat-panel">
+                    <div class="chat-header">
+                        <h2>Trò chuyện</h2>
+                        <div class="chat-tools">
+                            <button id="toggle-info-panel" title="Hiện/ẩn thông tin" class="mobile-only">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                            <button id="clear-chat" title="Xóa cuộc trò chuyện">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Tin nhắn sẽ được hiển thị ở đây -->
+                    </div>
+
+                    <div class="typing-indicator hidden" id="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <div class="chat-input">
+                        <input type="text" id="user-input" placeholder="Nhập số điện thoại hoặc đặt câu hỏi...">
+                        <button id="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sidebar thông tin - Phần phụ -->
+                <div class="info-panel" id="info-panel">
+                    <div class="info-panel-header">
+                        <h3>Thông tin</h3>
+                        <button id="close-info-panel" class="close-button mobile-only">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="info-tabs">
+                        <button class="info-tab-button active" data-tab="history">Lịch sử</button>
+                        <button class="info-tab-button" data-tab="account">Tài khoản</button>
+                    </div>
+                    
+                    <!-- Nội dung các tab -->
+                    <div class="info-tab-content active" id="history-tab">
+                        <div class="history-header">
+                            <h4>Lịch sử phân tích</h4>
+                            <button id="clear-history" class="clear-button">Xóa lịch sử</button>
+                        </div>
+                        <div id="analysis-history" class="analysis-history-container">
+                            <!-- Lịch sử phân tích sẽ được hiển thị ở đây -->
+                            <div class="empty-history-message">Đang tải lịch sử...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-tab-content" id="account-tab">
+                        <div class="account-section">
+                            <h4>Thông tin tài khoản</h4>
+                            <div class="account-info">
+                                <p><strong>Tên:</strong> <span id="account-name"></span></p>
+                                <p><strong>Email:</strong> <span id="account-email"></span></p>
+                                <p><strong>Ngày tạo:</strong> <span id="account-created"></span></p>
+                            </div>
+                            <button id="logout-btn-alt" class="btn-logout-alt">
+                                <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Templates -->
+    <template id="bot-message-template">
+        <div class="message bot-message">
+            <div class="message-content"></div>
+            <div class="analysis-data hidden"></div>
+            
+            <!-- Suggestion chips -->
+            <div class="suggestion-chips hidden">
+                <button class="category-btn" data-category="business">
+                    <i class="fas fa-briefcase"></i> Kinh doanh
+                </button>
+                <button class="category-btn" data-category="love">
+                    <i class="fas fa-heart"></i> Tình duyên
+                </button>
+                <button class="category-btn" data-category="wealth">
+                    <i class="fas fa-coins"></i> Tài lộc
+                </button>
+                <button class="category-btn" data-category="health">
+                    <i class="fas fa-heartbeat"></i> Sức khỏe
+                </button>
+            </div>
+            
+            <!-- Feedback buttons -->
+            <div class="feedback-buttons hidden">
+                <button class="feedback-btn positive">👍 Hữu ích</button>
+                <button class="feedback-btn negative">👎 Chưa chính xác</button>
+            </div>
+        </div>
+    </template>
+
+    <template id="user-message-template">
+        <div class="message user-message">
+            <div class="message-content"></div>
+        </div>
+    </template>
+
+    <template id="analysis-container-template">
+        <div class="analysis-container">
+            <div class="analysis-title">Phân tích số: <span class="phone-number"></span></div>
+            <div class="analysis-content">
+                <div class="analysis-section">
+                    <h4>Các sao chủ đạo</h4>
+                    <div class="star-list"></div>
+                </div>
+                
+                <!-- Thêm phần tổ hợp sao -->
+                <div class="analysis-section star-combinations-section">
+                    <h4>Tổ hợp sao</h4>
+                    <div class="star-combinations-list"></div>
+                </div>
+                
+                <div class="analysis-section">
+                    <h4>Cân bằng năng lượng</h4>
+                    <div class="energy-balance"></div>
+                </div>
+                
+                <button class="details-toggle" data-expanded="false">Xem chi tiết</button>
+            </div>
+        </div>
+    </template>
+
+    <template id="history-item-template">
+        <div class="history-item">
+            <div class="history-phone"></div>
+            <div class="history-time"></div>
+        </div>
+    </template>
+ 
+    <!-- JavaScript files -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/conversation-state.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/analysis.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Script sửa lỗi đăng ký -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fix cho nút chuyển tab đăng ký/đăng nhập
+            const authTabs = document.querySelectorAll('.auth-tab');
+            
+            function switchTab(tabName) {
+                // Cập nhật trạng thái nút
+                authTabs.forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`.auth-tab[data-tab="${tabName}"]`).classList.add('active');
+                
+                // Cập nhật form hiển thị
+                document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+                document.getElementById(`${tabName}-form`).classList.add('active');
+                
+                // Cập nhật tiêu đề
+                document.querySelector('.auth-header h3').textContent = tabName === 'login' ? 'Đăng Nhập' : 'Đăng Ký';
+            }
+            
+            authTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            // Log dữ liệu để debug
+            window.addEventListener('load', function() {
+                console.log('Đã tải xong trang');
+                
+                // Debug templates
+                console.log('Template bot message:', document.getElementById('bot-message-template'));
+                console.log('Template user message:', document.getElementById('user-message-template'));
+                console.log('Template analysis container:', document.getElementById('analysis-container-template'));
+                
+                // Debug API callbacks
+                const originalAnalyzePhoneNumber = window.API ? window.API.analyzePhoneNumber : null;
+                if (originalAnalyzePhoneNumber) {
+                    window.API.analyzePhoneNumber = function(phoneNumber) {
+                        console.log('Phân tích số điện thoại:', phoneNumber);
+                        return originalAnalyzePhoneNumber.call(this, phoneNumber).then(response => {
+                            console.log('Kết quả phân tích:', response);
+                            return response;
+                        });
+                    };
+                }
+                
+                // Debug UI.addBotMessage
+                const originalAddBotMessage = window.UI ? window.UI.addBotMessage : null;
+                if (originalAddBotMessage && !window.UI._debugWrapped) {
+                    window.UI._debugWrapped = true;
+                    window.UI._originalAddBotMessage = originalAddBotMessage;
+                    window.UI.addBotMessage = function(text, analysisData = null) {
+                        console.log('Thêm tin nhắn bot:', text);
+                        console.log('Dữ liệu phân tích:', analysisData);
+                        return window.UI._originalAddBotMessage.call(this, text, analysisData);
+                    };
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
