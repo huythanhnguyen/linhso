@@ -5,7 +5,7 @@
 
 const CONFIG = {
     // API Base URL - Change this to match your server's address
-    const url = `${CONFIG.API_BASE_URL}${endpoint}`;
+    API_BASE_URL: 'https://chatbotsdtapi.onrender.com/api',
     
     // Auth endpoints
     AUTH: {
