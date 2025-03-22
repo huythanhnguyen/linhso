@@ -5,7 +5,7 @@
 
 const CONFIG = {
     // API Base URL - Change this to match your server's address
-    API_BASE_URL: 'http://localhost:5000/api',
+    const url = `${CONFIG.API_BASE_URL}${endpoint}`;
     
     // Auth endpoints
     AUTH: {
