@@ -171,8 +171,8 @@ function renderStars(container, stars) {
     // Sắp xếp sao theo năng lượng (cao nhất trước)
     const sortedStars = [...stars].sort((a, b) => b.energyLevel - a.energyLevel);
     
-    // Hiển thị tối đa 4 sao
-    const displayStars = sortedStars.slice(0, 4);
+    // Hiển thị tối đa 3 sao
+    const displayStars = sortedStars.slice(0, 3);
     
     // Tạo phần tử cho mỗi sao
     displayStars.forEach(star => {
@@ -390,7 +390,7 @@ function showDetailModal(analysisData) {
                 <!-- Phần các sao -->
                 <h4 style="margin-top: 0; color: var(--primary-color);">Các Sao</h4>
                 <div class="stars-detail">
-                // Phần các sao
+               
                 ${analysisData.starSequence.length > 0 ? 
                     analysisData.starSequence.map(star => {
                         const dotType = star.nature === 'Cát' ? 'cat' : 
@@ -423,7 +423,7 @@ function showDetailModal(analysisData) {
                 <!-- Phần tổ hợp sao -->
                 <h4 style="margin-top: 20px; color: var(--primary-color);">Tổ Hợp Sao</h4>
                 <div class="star-combos-detail">
-                // Phần tổ hợp sao
+                
                 ${analysisData.starCombinations.length > 0 ? 
                     analysisData.starCombinations.map(combo => {
                         // Tính tổng năng lượng
