@@ -84,6 +84,417 @@
     max-height: none !important;
 }
 
+/* ===== FIX LỖI 01 - OVERLAY KHÔNG CLICK ĐƯỢC ===== */
+
+/* Sửa overlay để có thể click qua được trên các phần tử con */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 900; /* Giảm z-index để thấp hơn info-panel */
+    backdrop-filter: blur(2px);
+    transition: opacity var(--transition-normal);
+}
+
+.overlay.visible {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+    pointer-events: auto; /* Chỉ xử lý sự kiện khi visible */
+}
+
+/* Điều chỉnh z-index và position cho info-panel */
+.info-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 320px;
+    max-width: 85%;
+    transform: translateX(100%);
+    opacity: 0;
+    overflow-y: auto;
+    z-index: 901; /* Cao hơn overlay để có thể click được */
+    border-radius: 0;
+    border-left: 1px solid var(--border-color);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: transform var(--transition-normal), opacity var(--transition-normal);
+}
+
+.info-panel.visible {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* Đảm bảo các tab và nút có thể click được */
+.info-tabs, .info-tab-button, .close-button {
+    position: relative;
+    z-index: 902; /* Cao hơn nữa so với info-panel */
+}
+
+/* ===== FIX LỖI 02 - XIN CHÀO VÀ ĐĂNG XUẤT Ở 1 DÒNG ===== */
+
+/* Điều chỉnh header user để ở cùng một dòng */
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap; /* Không cho phép ngắt dòng */
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--border-color);
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Đảm bảo phần tên user vẫn có thể co giãn nhưng không quá nhỏ */
+.user-info {
+    font-weight: 600;
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1; 
+    min-width: 0; /* Cho phép co lại khi cần */
+    margin-right: var(--space-md); /* Đặt margin để không dính vào nút */
+}
+
+/* Nút đăng xuất không bị co lại */
+.btn-logout {
+    flex-shrink: 0; /* Không bị co lại */
+    white-space: nowrap; /* Không ngắt dòng */
+    min-width: fit-content;
+}
+
+/* Điều chỉnh responsive cho màn hình nhỏ */
+@media (max-width: 576px) {
+    .user-header {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .btn-logout {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-logout i {
+        margin-right: 4px;
+    }
+}
+
+/* Cực nhỏ: Nếu vẫn cần, ẩn chữ "Đăng xuất" và chỉ hiện icon */
+@media (max-width: 360px) {
+    .btn-logout span {
+        display: none;
+    }
+    
+    .btn-logout i {
+        margin-right: 0;
+    }
+    
+    .user-info {
+        max-width: 75%;
+    }
+}
+
+/* ===== FIX LỖI 03 - HIỂN THỊ NĂNG LƯỢNG DẠNG ICON CHO 8 LOẠI SAO ===== */
+
+/* Giao diện chung cho hiển thị sao */
+.star-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background-color: #f9f9f9;
+    margin-bottom: 5px;
+    border-left: 3px solid transparent;
+}
+
+/* Hiển thị tên sao */
+.star-name {
+    font-weight: 600;
+    margin-right: 8px;
+    flex: 1;
+}
+
+/* Hiển thị rating sao */
+.energy-value {
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-right: 5px;
+    color: #555;
+}
+
+/* Định dạng biểu tượng sao */
+.energy-stars {
+    letter-spacing: -1px;
+    font-size: 1rem;
+}
+
+/* TỨ CÁT - 4 loại sao tốt */
+
+/* 1. Thiên Y */
+.star-item:has(.star-name:contains("Thiên Y")),
+.star-item.thien-y {
+    border-left-color: #4caf50;
+}
+
+.star-item:has(.star-name:contains("Thiên Y")) .star-name, 
+.star-item.thien-y .star-name {
+    color: #4caf50;
+}
+
+.star-item:has(.star-name:contains("Thiên Y")) .energy-stars,
+.star-item.thien-y .energy-stars {
+    color: #4caf50;
+}
+
+/* 2. Sinh Khí */
+.star-item:has(.star-name:contains("Sinh Khí")),
+.star-item.sinh-khi {
+    border-left-color: #8bc34a;
+}
+
+.star-item:has(.star-name:contains("Sinh Khí")) .star-name,
+.star-item.sinh-khi .star-name {
+    color: #8bc34a;
+}
+
+.star-item:has(.star-name:contains("Sinh Khí")) .energy-stars,
+.star-item.sinh-khi .energy-stars {
+    color: #8bc34a;
+}
+
+/* 3. Diên Niên */
+.star-item:has(.star-name:contains("Diên Niên")),
+.star-item.dien-nien {
+    border-left-color: #009688;
+}
+
+.star-item:has(.star-name:contains("Diên Niên")) .star-name,
+.star-item.dien-nien .star-name {
+    color: #009688;
+}
+
+.star-item:has(.star-name:contains("Diên Niên")) .energy-stars,
+.star-item.dien-nien .energy-stars {
+    color: #009688;
+}
+
+/* 4. Phuc Vị */
+.star-item:has(.star-name:contains("Phuc Vị")),
+.star-item.phuc-vi {
+    border-left-color: #00bcd4;
+}
+
+.star-item:has(.star-name:contains("Phuc Vi")) .star-name,
+.star-item.phuc-vi .star-name {
+    color: #00bcd4;
+}
+
+.star-item:has(.star-name:contains("Phuc Vi")) .energy-stars,
+.star-item.phuc-vi .energy-stars {
+    color: #00bcd4;
+}
+
+/* TỨ HUNG - 4 loại sao xấu */
+
+/* 1. Ngũ Quỷ */
+.star-item:has(.star-name:contains("Ngũ Quỷ")),
+.star-item.ngu-quy {
+    border-left-color: #f44336;
+}
+
+.star-item:has(.star-name:contains("Ngũ Quỷ")) .star-name,
+.star-item.ngu-quy .star-name {
+    color: #f44336;
+}
+
+.star-item:has(.star-name:contains("Ngũ Quỷ")) .energy-stars,
+.star-item.ngu-quy .energy-stars {
+    color: #f44336;
+}
+
+/* 2. Lục Sát */
+.star-item:has(.star-name:contains("Lục Sát")),
+.star-item.luc-sat {
+    border-left-color: #ff5722;
+}
+
+.star-item:has(.star-name:contains("Lục Sát")) .star-name,
+.star-item.luc-sat .star-name {
+    color: #ff5722;
+}
+
+.star-item:has(.star-name:contains("Lục Sát")) .energy-stars,
+.star-item.luc-sat .energy-stars {
+    color: #ff5722;
+}
+
+/* 3. Họa Hại */
+.star-item:has(.star-name:contains("Họa Hại")),
+.star-item.hoa-hai {
+    border-left-color: #ff9800;
+}
+
+.star-item:has(.star-name:contains("Họa Hại")) .star-name,
+.star-item.hoa-hai .star-name {
+    color: #ff9800;
+}
+
+.star-item:has(.star-name:contains("Họa Hại")) .energy-stars,
+.star-item.hoa-hai .energy-stars {
+    color: #ff9800;
+}
+
+/* 4. Tuyệt Mệnh */
+.star-item:has(.star-name:contains("Tuyệt Mệnh")),
+.star-item.tuyet-menh {
+    border-left-color: #795548;
+}
+
+.star-item:has(.star-name:contains("Tuyệt Mệnh")) .star-name,
+.star-item.tuyet-menh .star-name {
+    color: #795548;
+}
+
+.star-item:has(.star-name:contains("Tuyệt Mệnh")) .energy-stars,
+.star-item.tuyet-menh .energy-stars {
+    color: #795548;
+}
+
+/* STAR COMBO STYLING */
+.star-combo, 
+.to-hop-sao {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.combo-star,
+.to-hop-sao > div {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin: 2px;
+}
+
+/* TỨ CÁT - Combo star styling */
+.combo-star:contains("Thiên Y"),
+.to-hop-sao > div:contains("Thiên Y"),
+.combo-thien-y {
+    color: #4caf50;
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.combo-star:contains("Sinh Khí"),
+.to-hop-sao > div:contains("Sinh Khí"),
+.combo-sinh-khi {
+    color: #8bc34a;
+    background-color: rgba(139, 195, 74, 0.1);
+}
+
+.combo-star:contains("Diên Niên"),
+.to-hop-sao > div:contains("Diên Niên"),
+.combo-dien-nien {
+    color: #009688;
+    background-color: rgba(0, 150, 136, 0.1);
+}
+
+.combo-star:contains("Phuc Vi"),
+.to-hop-sao > div:contains("Phuc Vi"),
+.combo-phuc-vi {
+    color: #00bcd4;
+    background-color: rgba(0, 188, 212, 0.1);
+}
+
+/* TỨ HUNG - Combo star styling */
+.combo-star:contains("Ngũ Quỷ"),
+.to-hop-sao > div:contains("Ngũ Quỷ"),
+.combo-ngu-quy {
+    color: #f44336;
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.combo-star:contains("Lục Sát"),
+.to-hop-sao > div:contains("Lục Sát"),
+.combo-luc-sat {
+    color: #ff5722;
+    background-color: rgba(255, 87, 34, 0.1);
+}
+
+.combo-star:contains("Họa Hại"),
+.to-hop-sao > div:contains("Họa Hại"),
+.combo-hoa-hai {
+    color: #ff9800;
+    background-color: rgba(255, 152, 0, 0.1);
+}
+
+.combo-star:contains("Tuyệt Mệnh"),
+.to-hop-sao > div:contains("Tuyệt Mệnh"),
+.combo-tuyet-menh {
+    color: #795548;
+    background-color: rgba(121, 85, 72, 0.1);
+}
+
+/* Dấu + và mô tả */
+.combo-plus,
+.to-hop-sao > span {
+    margin: 0 5px;
+    color: #666;
+    font-weight: bold;
+}
+
+.combo-description {
+    width: 100%;
+    margin-top: 8px;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Hiệu ứng hover cho các sao */
+.star-item:hover {
+    transform: translateX(3px);
+    background-color: #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+/* Hiệu ứng cho các loại sao được chọn */
+.star-item.selected {
+    background-color: rgba(0, 0, 0, 0.03);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Đánh dấu năng lượng bằng dấu sao */
+.energy-stars::after {
+    content: "★★★★";
+}
+
+.energy-value[data-value="1"] + .energy-stars::after {
+    content: "★☆☆☆";
+}
+
+.energy-value[data-value="2"] + .energy-stars::after {
+    content: "★★☆☆";
+}
+
+.energy-value[data-value="3"] + .energy-stars::after {
+    content: "★★★☆";
+}
+
+.energy-value[data-value="4"] + .energy-stars::after {
+    content: "★★★★";
+}
+
 /* Typing Indicator Fix */
 .typing-indicator.hidden {
     display: none !important;
@@ -139,40 +550,6 @@
     overflow: hidden;
 }
 
-.star-item {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.energy-levels {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* Fix cho Star Combinations */
-.star-combinations-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.star-combo-item {
-    background-color: #f9f9fa;
-    padding: 10px;
-    border-radius: var(--radius-sm);
-    border-left: 2px solid #ddd;
-}
-
-.star-combo-header {
-    display: flex;
-    margin-bottom: 6px;
-    flex-wrap: wrap;
-    gap: 5px;
-    align-items: center;
-}
-
 /* ===== SUGGESTION CHIPS & FEEDBACK BUTTONS FIXES ===== */
 
 /* Đảm bảo các nút gợi ý và phản hồi hiển thị đúng */
@@ -192,51 +569,16 @@
     margin-top: 8px;
 }
 
-/* ===== LOADER FIXES ===== */
+/* ===== Z-INDEX HIERARCHY ===== */
 
-/* Cải thiện màn hình loading */
-#loading-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: var(--background-color);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: var(--primary-color);
-    animation: spin 1s ease-in-out infinite;
-}
-
-/* ===== VISIBILITY & DISPLAY FIXES ===== */
-
-/* Đảm bảo ẩn đúng */
-.hidden {
-    display: none !important;
-}
-
-/* Đảm bảo hiển thị đúng overlay */
-.overlay.visible {
-    display: block !important;
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* Đảm bảo hiển thị đúng info panel */
-.info-panel.visible {
-    transform: translateX(0) !important;
-    opacity: 1 !important;
-}
+/* Đảm bảo thứ tự hiển thị đúng */
+#loading-container { z-index: 9999; }
+.overlay { z-index: 900; }
+.info-panel { z-index: 901; }
+.info-tabs, .info-panel-header, .close-button { z-index: 902; }
+.chat-input { z-index: 50; }
+.chat-header { z-index: 40; }
+.chat-messages { z-index: 30; }
 
 /* ===== SPECIFIC IOS/SAFARI FIXES ===== */
 
@@ -263,14 +605,6 @@
         -webkit-transform: translateZ(0);
     }
     
-    /* Sửa lỗi hiển thị trong viewport khi bàn phím hiển thị */
-    @media (max-height: 600px) {
-        .chat-panel {
-            height: 80vh;
-            max-height: -webkit-fill-available;
-        }
-    }
-    
     /* Sửa lỗi khi có notch trên iPhone */
     @supports (padding: max(0px)) {
         .chat-input {
@@ -281,158 +615,4 @@
             padding-bottom: max(70px, calc(70px + env(safe-area-inset-bottom)));
         }
     }
-}
-
-/* ===== WEBKIT-SPECIFIC FIXES ===== */
-
-/* Cải thiện thanh cuộn cho Webkit */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.15);
-}
-
-/* ===== ACCESSIBILITY FIXES ===== */
-
-/* Cải thiện truy cập */
-button, input, a {
-    touch-action: manipulation; /* Tối ưu hóa touch events */
-}
-
-input, textarea, select, button {
-    font-size: 16px; /* Tránh auto-zoom trên iOS */
-}
-
-/* ===== FALLBACK FIXES ===== */
-
-/* Class hiệu ứng khi focus vào tin nhắn */
-.message:focus-within {
-    box-shadow: 0 0 0 2px var(--primary-color);
-    outline: none;
-}
-
-/* Sửa lỗi khi JavaScript không hoạt động đúng */
-.js-fallback .chat-input {
-    position: static;
-    bottom: auto;
-}
-
-.js-fallback .chat-messages {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-bottom: var(--space-lg);
-}
-
-/* ===== ANIMATION PERFORMANCE FIXES ===== */
-
-/* Tối ưu hiệu suất animation */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
-}
-
-/* Tối ưu hóa CPU/GPU */
-.chat-messages, .message, .analysis-container {
-    will-change: transform; /* Nâng cao hiệu suất animation */
-    transform: translateZ(0); /* Kích hoạt hardware acceleration */
-}
-
-/* ===== Z-INDEX HIERARCHY ===== */
-
-/* Đảm bảo thứ tự hiển thị đúng */
-#loading-container { z-index: 9999; }
-.overlay { z-index: 999; }
-.info-panel { z-index: 900; }
-.chat-input { z-index: 50; }
-.chat-header { z-index: 40; }
-.chat-messages { z-index: 30; }
-
-/* ===== TOUCH SCREEN OPTIMIZATIONS ===== */
-
-/* Tối ưu cho màn hình cảm ứng */
-.category-btn,
-.feedback-btn,
-.chat-input button,
-.close-button,
-.chat-tools button {
-    min-height: 44px; /* Kích thước tối thiểu cho các phần tử có thể chạm */
-    min-width: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Đảm bảo không có text selection không mong muốn */
-.chat-header,
-.info-panel-header,
-.chat-tools button,
-.category-btn,
-.feedback-btn {
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-/* ===== INPUT INTERACTION IMPROVEMENTS ===== */
-
-/* Hiển thị theo kiểu iOS */
-@media (max-width: 768px) {
-    .chat-input {
-        display: flex;
-        align-items: center;
-        background-color: #f9f9f9;
-        border-top: 1px solid var(--border-color);
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    }
-    
-    .chat-input input {
-        border-radius: 20px;
-        padding-left: 16px;
-        background-color: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .chat-input button {
-        right: 16px;
-        width: 36px;
-        height: 36px;
-    }
-}
-
-/* Nâng cao trải nghiệm khi focus vào input */
-.chat-input input:focus {
-    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* ===== CLASS RIÊNG DÀNH CHO SCRIPT FIX ===== */
-
-/* Sửa khi chế độ landscape */
-.landscape-mode .chat-panel {
-    height: 60vh;
-}
-
-/* Sửa khi bàn phím hiển thị */
-.keyboard-visible .chat-panel {
-    height: 50vh;
-}
-
-/* Sửa khi màn hình nhỏ */
-.small-screen .chat-panel {
-    height: 85vh;
 }
