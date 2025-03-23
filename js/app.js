@@ -721,3 +721,90 @@ document.addEventListener('authStateChanged', function() {
         });
     }
 });
+// Lắng nghe sự kiện lỗi xác thực
+document.addEventListener('authError', function(e) {
+    debug('Auth error event received:', e.detail);
+    
+    // Hiển thị thông báo lỗi cho người dùng
+    showAuthErrorMessage(e.detail.message);
+    
+    // Hiển thị container đăng nhập
+    showAppropriateContainer(false);
+});
+
+/**
+ * Hiển thị thông báo lỗi xác thực
+ * @param {string} message - Nội dung thông báo lỗi
+ */
+function showAuthErrorMessage(message) {
+    // Tạo hoặc lấy phần tử thông báo lỗi
+    let errorElement = document.getElementById('auth-error-message');
+    
+    if (!errorElement) {
+        errorElement = document.createElement('div');
+        errorElement.id = 'auth-error-message';
+        errorElement.className = 'auth-error-message';
+        
+        // Định dạng thông báo lỗi
+        errorElement.style.backgroundColor = 'var(--danger-light, #ffebee)';
+        errorElement.style.color = 'var(--danger-color, #f44336)';
+        errorElement.style.padding = '10px 15px';
+        errorElement.style.borderRadius = 'var(--radius-md, 8px)';
+        errorElement.style.marginBottom = '15px';
+        errorElement.style.textAlign = 'center';
+        errorElement.style.fontWeight = '500';
+        errorElement.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+        errorElement.style.borderLeft = '3px solid var(--danger-color, #f44336)';
+        errorElement.style.animation = 'fadeIn 0.3s ease-out';
+        
+        // Thêm vào auth container
+        const authContainer = document.querySelector('.auth-box');
+        if (authContainer) {
+            authContainer.insertBefore(errorElement, authContainer.firstChild);
+        }
+    }
+    
+    // Cập nhật nội dung thông báo
+    errorElement.textContent = message;
+    
+    // Tự động ẩn sau 15 giây
+    setTimeout(() => {
+        if (errorElement.parentNode) {
+            errorElement.style.opacity = '0';
+            errorElement.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                if (errorElement.parentNode) {
+                    errorElement.parentNode.removeChild(errorElement);
+                }
+            }, 500);
+        }
+    }, 15000);
+}
+
+// Thêm CSS animation cho thông báo
+function addAuthErrorStyles() {
+    const styleExists = document.getElementById('auth-error-styles');
+    if (styleExists) return;
+    
+    const style = document.createElement('style');
+    style.id = 'auth-error-styles';
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .auth-error-message {
+            animation: fadeIn 0.3s ease-out;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Gọi thêm CSS khi DOM đã sẵn sàng
+document.addEventListener('DOMContentLoaded', function addStyles() {
+    addAuthErrorStyles();
+    // Chỉ gọi một lần
+    document.removeEventListener('DOMContentLoaded', addStyles);
+});
