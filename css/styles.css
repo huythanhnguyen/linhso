@@ -1430,3 +1430,96 @@ header p {
 .history-balance i {
     margin-right: 4px;
 }
+/* Add these styles to your CSS file to fix the chat display on mobile */
+
+/* Improve message display on all devices */
+.message {
+    max-width: 80%;
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+    line-height: 1.5;
+    border: 1px solid var(--border-color);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.message-content {
+    white-space: normal; /* Changed from pre-line to allow better wrapping */
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    .message {
+        max-width: 85%;
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.95rem;
+        margin-bottom: var(--space-sm);
+    }
+    
+    .chat-messages {
+        padding: var(--space-md);
+        gap: var(--space-sm);
+    }
+    
+    .chat-panel {
+        height: 80vh; /* Slightly taller on mobile */
+    }
+    
+    /* Ensure chat input is easily accessible */
+    .chat-input {
+        padding: var(--space-sm);
+    }
+    
+    .chat-input input {
+        height: 42px;
+        padding: var(--space-sm) var(--space-md);
+        padding-right: 40px;
+    }
+    
+    .chat-input button {
+        width: 32px;
+        height: 32px;
+        right: calc(var(--space-sm) + 6px);
+    }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+    .message {
+        max-width: 90%;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.9rem;
+    }
+    
+    .user-message, .bot-message {
+        border-width: 1px; /* Thinner borders on very small screens */
+    }
+    
+    .chat-messages {
+        padding: var(--space-sm);
+    }
+}
+
+/* Fix for message content display */
+.bot-message .message-content, 
+.user-message .message-content {
+    min-height: auto; /* Allow messages to expand as needed */
+    max-height: none; /* Remove any max-height restriction */
+    overflow: visible; /* Ensure content isn't cut off */
+    display: block; /* Force block display for proper sizing */
+}
+
+/* Analysis container adjustments for mobile */
+@media (max-width: 768px) {
+    .analysis-container {
+        padding: var(--space-sm);
+    }
+    
+    .star-item {
+        padding: 8px;
+    }
+}
