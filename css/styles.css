@@ -1156,7 +1156,61 @@ header p {
 .energy-value.negative {
     color: var(--inauspicious-color);
 }
+/* Hiển thị năng lượng sao */
+.star-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background-color: #f9f9f9;
+    margin-bottom: 5px;
+}
 
+.star-name {
+    font-weight: 600;
+    margin-right: 8px;
+    flex: 1;
+}
+
+.energy-rating {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.energy-value {
+    color: #444;
+    margin-right: 4px;
+}
+
+.energy-stars {
+    color: gold;
+    letter-spacing: -2px;
+}
+
+/* Star combo styling */
+.star-combo {
+    background-color: #f5f5f5;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.combo-star {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.combo-plus {
+    margin: 0 8px;
+    color: #666;
+    font-weight: bold;
+}
 /* Toggle Button */
 .details-toggle {
     background-color: #f0f0f0;
