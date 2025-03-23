@@ -1385,3 +1385,23 @@ header p {
         height: 6px;
     }
 }
+/* CSS cho hiển thị năng lượng trong phần chi tiết */
+.detail-energy {
+    display: flex;
+    gap: 3px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.star-detail-energy, .combo-energy {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+}
+
+.star-detail-item, .star-combo-detail {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9fa;
+    border-radius: 8px;
+}
