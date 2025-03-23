@@ -797,28 +797,43 @@ window.UI = {};
             return null;
         }
     }
-    /**
-     * Hàm mới để định dạng nội dung tin nhắn bot
-     */
-    function formatBotMessage(text) {
-        if (!text) return '';
+   /**
+ * Hàm định dạng nội dung tin nhắn bot để dễ đọc hơn
+ */
+function formatBotMessage(text) {
+    if (!text) return '';
+    
+    // Thay thế định dạng đậm **text** bằng thẻ <strong>
+    let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Thêm class cho các đoạn có chứa tiêu đề in đậm để tạo khoảng cách
+    formattedText = formattedText.replace(/(<strong>.*?<\/strong>)/g, '<span class="section-title">$1</span>');
+    
+    // Chia thành các đoạn và thêm class cho đoạn đầu tiên
+    let paragraphs = formattedText.split('\n\n');
+    
+    // Xử lý từng đoạn
+    paragraphs = paragraphs.map((paragraph, index) => {
+        if (!paragraph.trim()) return '';
         
-        // Thay thế định dạng đậm **text** bằng thẻ <strong>
-        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Kiểm tra nếu đoạn bắt đầu bằng tiêu đề
+        if (paragraph.includes('<span class="section-title">')) {
+            return `<p class="section-paragraph">${paragraph}</p>`;
+        }
         
-        // Chia thành các đoạn
-        formattedText = formattedText.split('\n\n').map(paragraph => {
-            if (!paragraph.trim()) return '';
-            return `<p>${paragraph}</p>`;
-        }).join('');
-        
-        // Xử lý danh sách nếu có
-        formattedText = formattedText.replace(/<p>- (.*?)<\/p>/g, '<li>$1</li>');
-        formattedText = formattedText.replace(/<li>(.*?)<\/li>/g, '<ul><li>$1</li></ul>');
-        formattedText = formattedText.replace(/<\/ul><ul>/g, '');
-        
-        return formattedText;
-    }
+        return `<p>${paragraph}</p>`;
+    });
+    
+    formattedText = paragraphs.join('');
+    
+    // Xử lý danh sách nếu có
+    formattedText = formattedText.replace(/<p>- (.*?)<\/p>/g, '<li>$1</li>');
+    formattedText = formattedText.replace(/<li>(.*?)<\/li>/g, '<ul><li>$1</li></ul>');
+    formattedText = formattedText.replace(/<\/ul><ul>/g, '');
+    
+    return formattedText;
+}
+    
     /**
      * Add a bot message to the chat
      * @param {string} text - Message content
