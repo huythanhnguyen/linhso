@@ -190,3 +190,204 @@
         max-height: 70vh;
     }
 }
+/* Complete Mobile Chat Interface Fix for iOS and Android */
+
+
+/* 2. Main chat panel structure */
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--chat-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+/* 3. Fix for chat messages container */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    padding: var(--space-md);
+    padding-bottom: 70px; /* Make space for fixed input */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 4. Message bubbles core styling */
+.message {
+    width: auto !important;
+    max-width: 85%;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+    line-height: 1.5;
+    
+    /* Ensure proper wrapping */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    
+    /* Force height expansion */
+    min-height: auto;
+    height: auto !important;
+    max-height: none !important;
+    
+    /* Fix display */
+    display: inline-block;
+}
+
+/* 5. Message content styles */
+.message-content {
+    /* Critical for text wrapping */
+    white-space: normal !important;
+    overflow: visible;
+    width: 100%;
+    display: inline !important;
+    
+    /* Prevent size constraints */
+    min-height: auto;
+    height: auto !important;
+    max-height: none !important;
+    
+    /* Fix text rendering */
+    -webkit-text-size-adjust: 100%;
+}
+
+/* 6. User & bot message specific styles */
+.user-message {
+    align-self: flex-end;
+    background-color: var(--primary-light);
+    color: var(--text-primary);
+    border-bottom-right-radius: var(--radius-sm);
+    margin-left: auto;
+}
+
+.bot-message {
+    align-self: flex-start;
+    background-color: var(--bot-msg-bg);
+    color: var(--text-primary);
+    border-bottom-left-radius: var(--radius-sm);
+    margin-right: auto;
+}
+
+/* 7. Fixed chat input at the bottom */
+.chat-input {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px var(--space-md);
+    background-color: #f9f9f9;
+    border-top: 1px solid var(--border-color);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+}
+
+.chat-input input {
+    flex: 1;
+    height: 44px;
+    padding: 0 40px 0 15px;
+    border-radius: 22px;
+    border: 1px solid var(--border-color);
+    background-color: white;
+    font-size: 16px; /* Prevent iOS zoom on focus */
+}
+
+.chat-input button {
+    position: absolute;
+    right: calc(var(--space-md) + 5px);
+    width: 36px;
+    height: 36px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 8. iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+    /* Force expand messages on iOS */
+    .message {
+        width: auto !important;
+        display: inline-block !important;
+    }
+    
+    .message-content {
+        display: inline !important;
+    }
+    
+    /* Fix for iOS Safari text sizing */
+    body {
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    /* Fix for iOS scroll bouncing */
+    .chat-panel {
+        -webkit-transform: translateZ(0);
+    }
+}
+
+/* 9. Handle iPhone X+ notch */
+@supports (padding: max(0px)) {
+    .chat-input {
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+    
+    .chat-messages {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+}
+
+/* 10. Responsive adjustments */
+@media screen and (max-width: 480px) {
+    .message {
+        max-width: 90%;
+        font-size: 15px;
+        padding: 8px 12px;
+    }
+    
+    .chat-panel {
+        height: 80vh;
+    }
+    
+    .chat-input {
+        padding: 8px 12px;
+    }
+    
+    .chat-input input {
+        height: 40px;
+    }
+}
+
+/* 11. Fix analysis container in messages */
+.analysis-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+/* 12. Ensure suggestions and feedback buttons display properly */
+.suggestion-chips, 
+.feedback-buttons {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
