@@ -1449,3 +1449,71 @@ header p {
 .message.bot-message {
     max-width: 80%;
 }
+/* Cải thiện hiển thị tin nhắn bot */
+.bot-message .message-content {
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.bot-message .message-content p {
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+/* Tăng khoảng cách cho đoạn văn có tiêu đề */
+.bot-message .message-content .section-title {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.bot-message .message-content .section-paragraph {
+    margin-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding-top: 12px;
+}
+
+/* Không đặt border-top cho đoạn đầu tiên */
+.bot-message .message-content p:first-child.section-paragraph {
+    border-top: none;
+    padding-top: 0;
+}
+
+/* Tạo khoảng cách giữa các đoạn */
+.bot-message .message-content p + p {
+    margin-top: 10px;
+}
+
+/* Cải thiện hiển thị danh sách */
+.bot-message .message-content ul {
+    margin: 8px 0 16px 16px;
+    padding-left: 5px;
+}
+
+.bot-message .message-content li {
+    margin-bottom: 8px;
+    position: relative;
+    list-style-type: none;
+    padding-left: 15px;
+}
+
+.bot-message .message-content li:before {
+    content: "•";
+    color: var(--primary-color);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* Làm nổi bật text in đậm */
+.bot-message .message-content strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Tăng độ rộng tối đa cho tin nhắn bot để hiển thị nhiều nội dung hơn */
+.message.bot-message {
+    max-width: 80%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
