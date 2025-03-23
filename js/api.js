@@ -24,15 +24,14 @@ const API = (function() {
             }
         };
         
-
         // Add authentication token if required
         if (auth) {
             const token = getAuthToken();
             if (token) {
                 options.headers['Authorization'] = `Bearer ${token}`;
             } else if (auth) {
-                // Nếu yêu cầu xác thực nhưng không có token, ném lỗi sớm
-                throw new Error('Không tìm thấy token xác thực');
+                // Return a rejected promise instead of throwing an error immediately
+                return Promise.reject(new Error('Không tìm thấy token xác thực'));
             }
         }
         
@@ -42,10 +41,14 @@ const API = (function() {
         }
         
         try {
-            // Setup timeout for request
+            // Use AbortController for timeout
+            const controller = new AbortController();
+            options.signal = controller.signal;
+            
+            // Create a timeout that aborts the fetch
             const timeoutId = setTimeout(() => {
-                throw new Error('Request timeout');
-            }, CONFIG.REQUEST_TIMEOUT);
+                controller.abort();
+            }, CONFIG.REQUEST_TIMEOUT || 30000); // Default to 30 seconds if not configured
             
             // Send the request
             const response = await fetch(url, options);
@@ -58,11 +61,22 @@ const API = (function() {
             
             // Check if the request was successful
             if (!response.ok) {
-                throw new Error(responseData.message || 'API request failed');
+                const error = new Error(responseData.message || 'API request failed');
+                error.status = response.status;
+                error.response = responseData;
+                throw error;
             }
             
             return responseData;
         } catch (error) {
+            if (error.name === 'AbortError') {
+                debug('API Request Timeout:', endpoint);
+                // Create a more descriptive error for timeout
+                const timeoutError = new Error('Request timeout');
+                timeoutError.isTimeout = true;
+                throw timeoutError;
+            }
+            
             debug('API Error:', error);
             throw error;
         }
@@ -77,14 +91,19 @@ const API = (function() {
      * @returns {Promise} Login response
      */
     async function login(email, password) {
-        const response = await request(CONFIG.AUTH.LOGIN, 'POST', { email, password }, false);
-        
-        if (response.token) {
-            setAuthToken(response.token);
-            setUser(response.user);
+        try {
+            const response = await request(CONFIG.AUTH.LOGIN, 'POST', { email, password }, false);
+            
+            if (response.token) {
+                setAuthToken(response.token);
+                setUser(response.user);
+            }
+            
+            return response;
+        } catch (error) {
+            debug('Login error:', error);
+            throw error;
         }
-        
-        return response;
     }
     
     /**
@@ -95,14 +114,19 @@ const API = (function() {
      * @returns {Promise} Register response
      */
     async function register(name, email, password) {
-        const response = await request(CONFIG.AUTH.REGISTER, 'POST', { name, email, password }, false);
-        
-        if (response.token) {
-            setAuthToken(response.token);
-            setUser(response.user);
+        try {
+            const response = await request(CONFIG.AUTH.REGISTER, 'POST', { name, email, password }, false);
+            
+            if (response.token) {
+                setAuthToken(response.token);
+                setUser(response.user);
+            }
+            
+            return response;
+        } catch (error) {
+            debug('Register error:', error);
+            throw error;
         }
-        
-        return response;
     }
     
     /**
@@ -180,7 +204,10 @@ const API = (function() {
      */
     async function analyzePhoneNumber(phoneNumber) {
         try {
-            const response = await request(CONFIG.ANALYSIS.ANALYZE, 'POST', { phoneNumber });
+            // Normalize phone number by removing non-digit characters
+            const normalizedNumber = phoneNumber.replace(/\D/g, '');
+            
+            const response = await request(CONFIG.ANALYSIS.ANALYZE, 'POST', { phoneNumber: normalizedNumber });
             debug('Received analysis response:', response);
             return response;
         } catch (error) {
