@@ -89,6 +89,8 @@ function formatPhoneNumber(phoneNumber) {
 
 /**
  * Hàm tạo phần tử phân tích
+ * @param {object} analysisData - Dữ liệu phân tích từ API
+ * @returns {HTMLElement} - Phần tử DOM chứa dữ liệu phân tích
  */
 function createAnalysisElement(analysisData) {
     // Chuẩn hóa dữ liệu
@@ -121,10 +123,35 @@ function createAnalysisElement(analysisData) {
     if (toggleBtn) {
         toggleBtn.addEventListener('click', function() {
             console.log("Đã nhấn nút chi tiết!", analysisData);
-            // Tạo modal chi tiết khi người dùng nhấn vào nút
-            showDetailModal(analysisData);
+            // Kiểm tra trạng thái hiển thị chi tiết
+            const isExpanded = this.getAttribute('data-expanded') === 'true';
+            
+            if (isExpanded) {
+                // Nếu đang mở, ẩn chi tiết
+                const detailedView = container.querySelector('.detailed-view');
+                if (detailedView) {
+                    detailedView.remove();
+                }
+                
+                this.textContent = 'Xem chi tiết';
+                this.setAttribute('data-expanded', 'false');
+            } else {
+                // Nếu đang ẩn, hiển thị chi tiết
+                showDetailModal(analysisData);
+                
+                this.textContent = 'Ẩn chi tiết';
+                this.setAttribute('data-expanded', 'true');
+            }
         });
     }
+    
+    // Thêm lớp CSS để hiển thị animation khi mới tạo
+    container.classList.add('highlight-new');
+    
+    // Xóa lớp CSS sau 2 giây
+    setTimeout(() => {
+        container.classList.remove('highlight-new');
+    }, 2000);
     
     return container;
 }
@@ -152,15 +179,27 @@ function renderStars(container, stars) {
         const starItem = document.createElement('div');
         starItem.className = `star-item ${star.nature === 'Cát' ? 'cat' : star.nature === 'Hung' ? 'hung' : ''}`;
         
+        // Xác định màu cho energy dots dựa trên nature của sao
+        const dotType = star.nature === 'Cát' ? 'cat' : 
+                       (star.nature === 'Hung' ? 'hung' : 
+                       (star.nature === 'Cát hóa hung' ? 'cat-hung' : 'neutral'));
+        
+        // Tạo HTML cho dots hiển thị năng lượng
+        let energyDotsHTML = '';
+        for (let i = 0; i < 4; i++) {
+            energyDotsHTML += `<div class="energy-dot ${dotType} ${i < star.energyLevel ? 'active' : ''}"></div>`;
+        }
+        
         // Nội dung star item
         starItem.innerHTML = `
-            <div class="star-name">${star.name}</div>
-            <div class="star-pair">${star.originalPair}</div>
+            <div class="star-header">
+                <div class="star-name">${star.name}</div>
+                <div class="star-pair">${star.originalPair}</div>
+            </div>
             <div class="star-energy">
+                <div class="energy-label">Năng lượng:</div>
                 <div class="energy-indicator">
-                    ${Array(4).fill().map((_, i) => 
-                        `<div class="energy-dot ${star.nature === 'Cát' ? 'cat' : star.nature === 'Hung' ? 'hung' : ''} ${i < star.energyLevel ? 'active' : ''}"></div>`
-                    ).join('')}
+                    ${energyDotsHTML}
                 </div>
             </div>
         `;
@@ -190,8 +229,38 @@ function renderStarCombinations(container, starCombinations) {
         const comboItem = document.createElement('div');
         comboItem.className = 'star-combo-item';
         
-        const firstStarNature = combo.firstStar && combo.firstStar.nature === 'Cát' ? 'auspicious' : (combo.firstStar && combo.firstStar.nature === 'Hung' ? 'inauspicious' : '');
-        const secondStarNature = combo.secondStar && combo.secondStar.nature === 'Cát' ? 'auspicious' : (combo.secondStar && combo.secondStar.nature === 'Hung' ? 'inauspicious' : '');
+        const firstStarNature = combo.firstStar && combo.firstStar.nature === 'Cát' ? 'auspicious' : 
+                             (combo.firstStar && combo.firstStar.nature === 'Hung' ? 'inauspicious' : '');
+                             
+        const secondStarNature = combo.secondStar && combo.secondStar.nature === 'Cát' ? 'auspicious' : 
+                              (combo.secondStar && combo.secondStar.nature === 'Hung' ? 'inauspicious' : '');
+        
+        // Tính tổng năng lượng
+        const firstStarEnergy = combo.firstStar ? combo.firstStar.energyLevel || 0 : 0;
+        const secondStarEnergy = combo.secondStar ? combo.secondStar.energyLevel || 0 : 0;
+        const totalEnergy = combo.totalEnergy || (firstStarEnergy + secondStarEnergy);
+        
+        // Xác định màu dựa vào tính chất của tổ hợp
+        const isPositive = combo.isPositive || 
+                         (combo.firstStar && combo.secondStar && 
+                          combo.firstStar.nature === 'Cát' && 
+                          combo.secondStar.nature === 'Cát');
+                          
+        const isNegative = combo.isNegative || 
+                         (combo.firstStar && combo.secondStar && 
+                          combo.firstStar.nature === 'Hung' && 
+                          combo.secondStar.nature === 'Hung');
+                          
+        const dotType = isPositive ? 'cat' : (isNegative ? 'hung' : 'mixed');
+        
+        // Tạo HTML cho dots hiển thị năng lượng (tối đa 8 dots)
+        let energyDotsHTML = '';
+        const maxDots = 8; // Max là 8 dots (2 sao * 4 năng lượng mỗi sao)
+        const energyLevel = Math.min(totalEnergy, maxDots);
+        
+        for (let i = 0; i < maxDots; i++) {
+            energyDotsHTML += `<div class="energy-dot ${dotType} ${i < energyLevel ? 'active' : ''}"></div>`;
+        }
         
         // HTML cho tổ hợp
         comboItem.innerHTML = `
@@ -199,6 +268,12 @@ function renderStarCombinations(container, starCombinations) {
                 <span class="star-name ${firstStarNature}">${combo.firstStar ? combo.firstStar.name : ''}</span>
                 <span class="combo-plus">+</span>
                 <span class="star-name ${secondStarNature}">${combo.secondStar ? combo.secondStar.name : ''}</span>
+            </div>
+            <div class="star-combo-energy">
+                <div class="energy-label">Tổng năng lượng: ${totalEnergy}</div>
+                <div class="energy-indicator">
+                    ${energyDotsHTML}
+                </div>
             </div>
             <div class="star-combo-desc">${combo.description || ''}</div>
         `;
@@ -252,7 +327,7 @@ function renderEnergyBalance(container, analysisData) {
     // Thêm mức năng lượng
     const totalEnergy = analysisData.energyLevel.total || 0;
     const catEnergy = analysisData.energyLevel.cat || 0;
-    const hungEnergy = analysisData.energyLevel.hung || 0;
+    const hungEnergy = Math.abs(analysisData.energyLevel.hung || 0);
     
     // HTML cho energy levels
     const energyLevelsHtml = `
@@ -269,12 +344,21 @@ function renderEnergyBalance(container, analysisData) {
                 <span class="energy-label">Hung:</span>
                 <span class="energy-value negative">${hungEnergy}</span>
             </div>
+            ${analysisData.energyLevel.ratio ? `
+            <div class="energy-item">
+                <span class="energy-label">Tỷ lệ:</span>
+                <span class="energy-value">${analysisData.energyLevel.ratio.toFixed(2)}</span>
+            </div>` : ''}
         </div>
     `;
     
     energyBalance.innerHTML += energyLevelsHtml;
+    
+    // Thêm biểu đồ trực quan (nếu cần)
+    if (window.addEnergyChart && typeof window.addEnergyChart === 'function') {
+        window.addEnergyChart(analysisData.energyLevel);
+    }
 }
-
 /**
  * Hàm hiển thị modal chi tiết
  */
