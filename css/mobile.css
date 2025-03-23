@@ -1,36 +1,43 @@
 /**
  * Mobile Styles - Phone Analysis App
+ * CSS dành riêng cho các thiết bị di động
  */
 
-/* Small tablets and large phones */
+/* ===== TABLET (< 992px) ===== */
 @media (max-width: 992px) {
+    /* Cấu trúc trang */
     .main-content {
         flex-direction: column;
         position: relative;
     }
     
-    .mobile-only {
-        display: flex;
+    .container {
+        padding: var(--space-sm);
     }
     
+    /* Chat Panel */
     .chat-panel {
-        height: 70vh;
+        height: 75vh;
         z-index: 1;
+        width: 100%;
+        max-width: 100%;
     }
     
+    /* Info Panel */
     .info-panel {
         position: fixed;
         top: 0;
         right: 0;
         height: 100%;
-        width: 300px;
-        max-width: 80%;
+        width: 320px;
+        max-width: 85%;
         transform: translateX(100%);
         opacity: 0;
         overflow-y: auto;
         z-index: 1000;
         border-radius: 0;
         border-left: 1px solid var(--border-color);
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     }
     
     .info-panel.visible {
@@ -38,104 +45,179 @@
         opacity: 1;
     }
     
+    /* Auth Box */
     .auth-box {
         width: 90%;
+        max-width: 450px;
+    }
+    
+    /* Các nút di động */
+    .mobile-only {
+        display: flex;
+    }
+    
+    /* User Header */
+    .user-header {
+        margin-bottom: var(--space-md);
+    }
+    
+    /* Header */
+    header {
+        padding: var(--space-md) 0;
+        margin-bottom: var(--space-lg);
+    }
+    
+    header h2 {
+        font-size: 1.6rem;
+    }
+    
+    header p {
+        font-size: 0.95rem;
     }
 }
 
-/* Mobile phones */
-@media (max-width: 576px) {
+/* ===== MOBILE PHONE (< 768px) ===== */
+@media (max-width: 768px) {
+    /* Giảm các khoảng cách */
     :root {
-        /* Reduce spacing on small screens */
         --space-md: 12px;
         --space-lg: 16px;
         --space-xl: 24px;
     }
-
-    .container {
-        padding: var(--space-xs);
-    }
     
+    /* Header nhỏ hơn */
     header {
-        padding: var(--space-md) 0;
+        padding: var(--space-sm) 0;
         margin-bottom: var(--space-md);
     }
     
     header h2 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
     }
     
     header p {
         font-size: 0.9rem;
+        max-width: 100%;
     }
     
-    .message {
-        max-width: 85%;
-        padding: var(--space-sm) var(--space-md);
+    /* User Header */
+    .user-header {
+        flex-direction: row;
+        align-items: center;
+        padding: var(--space-sm);
     }
     
+    .btn-logout {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .user-info {
+        font-size: 1rem;
+    }
+    
+    /* Chat Panel */
     .chat-panel {
         height: 80vh;
     }
     
-    .chat-messages {
-        padding: var(--space-md);
-    }
-    
-    .chat-input {
-        padding: var(--space-sm);
-    }
-    
-    .chat-input input {
+    .chat-header {
         padding: var(--space-sm) var(--space-md);
     }
     
+    .chat-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    /* Chat Messages */
+    .chat-messages {
+        padding: var(--space-md);
+        padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    }
+    
+    /* Message Bubbles */
+    .message {
+        max-width: 85%;
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.95rem;
+    }
+    
+    /* Chat Input */
+    .chat-input {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .chat-input input {
+        height: 44px;
+        font-size: 16px; /* Để ngăn iOS zoom khi focus */
+        padding: var(--space-sm) 44px var(--space-sm) var(--space-md);
+    }
+    
+    .chat-input button {
+        width: 34px;
+        height: 34px;
+        right: calc(var(--space-md) + 5px);
+    }
+    
+    /* Info Panel */
     .info-panel {
         width: 85%;
     }
     
-    .info-panel-header {
-        padding: var(--space-sm) var(--space-md);
+    .info-tab-button {
+        font-size: 0.9rem;
+        padding: 10px;
     }
     
     .info-tab-content {
         padding: var(--space-sm);
     }
     
+    /* Suggestion Chips */
+    .suggestion-chips {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .category-btn {
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+    
+    /* Feedback Buttons */
+    .feedback-buttons {
+        flex-wrap: wrap;
+    }
+    
+    /* Analysis Container */
+    .analysis-container {
+        padding: 12px;
+    }
+    
+    .energy-levels {
+        flex-wrap: wrap;
+    }
+}
+
+/* ===== SMALL MOBILE (< 576px) ===== */
+@media (max-width: 576px) {
+    /* Giảm thêm khoảng cách */
+    :root {
+        --space-md: 10px;
+        --space-lg: 14px;
+    }
+    
+    .container {
+        padding: var(--space-xs);
+    }
+    
+    /* Auth */
     .auth-box {
         width: 100%;
         max-width: 100%;
         border-radius: 0;
     }
     
-    .form-group input {
-        padding: 10px 12px;
-    }
-    
-    .user-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-md);
-    }
-    
-    .suggestion-chips {
-        flex-wrap: wrap;
-    }
-    
-    .category-btn {
-        padding: 4px 10px;
-        font-size: 13px;
-    }
-    
-    .feedback-buttons {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-xs);
-    }
-}
-
-/* Extra small devices */
-@media (max-width: 380px) {
     .auth-header {
         padding: var(--space-sm);
     }
@@ -149,31 +231,147 @@
         font-size: 13px;
     }
     
+    .form-group input {
+        padding: 10px;
+    }
+    
+    /* Chat Panel */
+    .chat-panel {
+        height: 85vh;
+        border-radius: var(--radius-sm);
+    }
+    
+    /* Messages */
     .message {
         max-width: 90%;
         padding: 8px 12px;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+    
+    .chat-messages {
+        gap: var(--space-sm);
+    }
+    
+    /* Chat Input */
+    .chat-input {
+        padding: 8px 10px;
+    }
+    
+    .chat-input input {
+        height: 40px;
+        padding: 8px 40px 8px 12px;
     }
     
     .chat-input button {
         width: 32px;
         height: 32px;
+        right: 15px;
+    }
+    
+    /* Info Panel */
+    .info-panel {
+        width: 100%;
+    }
+    
+    .info-panel-header {
+        padding: 10px 12px;
+    }
+    
+    .info-panel-header h3 {
+        font-size: 1rem;
     }
     
     .info-tab-button {
-        padding: 6px 8px;
-        font-size: 13px;
+        padding: 8px;
+        font-size: 0.85rem;
     }
     
-    .chat-tools button {
-        width: 32px;
-        height: 32px;
+    .info-tab-content {
+        padding: 10px;
+    }
+    
+    /* History Items */
+    .history-item {
+        padding: 10px;
+    }
+    
+    .history-phone {
+        font-size: 1rem;
+    }
+    
+    /* Analysis Container */
+    .analysis-section h4 {
+        font-size: 0.9rem;
+    }
+    
+    .star-item {
+        padding: 6px 8px;
+    }
+    
+    .star-pair {
+        font-size: 0.75rem;
+        padding: 1px 5px;
+    }
+    
+    .energy-item {
+        padding: 5px;
+    }
+    
+    .energy-value {
+        font-size: 1rem;
+    }
+    
+    /* User Header */
+    .user-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
     }
 }
 
-/* Landscape orientation on mobile */
+/* ===== VERY SMALL MOBILE (< 380px) ===== */
+@media (max-width: 380px) {
+    .message {
+        max-width: 95%;
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+    
+    .chat-input input {
+        height: 38px;
+        font-size: 15px;
+    }
+    
+    .chat-input button {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+    
+    .category-btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .feedback-btn {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+    
+    .history-phone {
+        font-size: 0.95rem;
+    }
+    
+    .star-list, .energy-levels {
+        gap: 4px;
+    }
+}
+
+/* ===== LANDSCAPE MODE ===== */
 @media (max-height: 500px) and (orientation: landscape) {
     .chat-panel {
-        height: 60vh;
+        height: 65vh;
     }
     
     .auth-container {
@@ -181,213 +379,72 @@
         padding: var(--space-md) 0;
     }
     
+    .chat-messages {
+        padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+    }
+    
+    .chat-input {
+        padding: 6px var(--space-sm);
+    }
+    
+    .chat-input input {
+        height: 38px;
+    }
+    
     header {
-        padding: var(--space-sm) 0;
+        padding: var(--space-xs) 0;
         margin-bottom: var(--space-sm);
     }
     
     .info-tab-content {
-        max-height: 70vh;
+        max-height: 60vh;
     }
 }
-/* Complete Mobile Chat Interface Fix for iOS and Android */
 
-
-/* 2. Main chat panel structure */
-.chat-panel {
-    display: flex;
-    flex-direction: column;
-    height: 75vh;
-    position: relative;
-    overflow: hidden;
-    background-color: var(--chat-bg);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color);
-}
-
-/* 3. Fix for chat messages container */
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    padding: var(--space-md);
-    padding-bottom: 70px; /* Make space for fixed input */
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* 4. Message bubbles core styling */
-.message {
-    width: auto !important;
-    max-width: 85%;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-lg);
-    position: relative;
-    animation: fadeIn 0.3s ease-in-out;
-    line-height: 1.5;
-    
-    /* Ensure proper wrapping */
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    word-break: break-word;
-    -webkit-hyphens: auto;
-    hyphens: auto;
-    
-    /* Force height expansion */
-    min-height: auto;
-    height: auto !important;
-    max-height: none !important;
-    
-    /* Fix display */
-    display: inline-block;
-}
-
-/* 5. Message content styles */
-.message-content {
-    /* Critical for text wrapping */
-    white-space: normal !important;
-    overflow: visible;
-    width: 100%;
-    display: inline !important;
-    
-    /* Prevent size constraints */
-    min-height: auto;
-    height: auto !important;
-    max-height: none !important;
-    
-    /* Fix text rendering */
-    -webkit-text-size-adjust: 100%;
-}
-
-/* 6. User & bot message specific styles */
-.user-message {
-    align-self: flex-end;
-    background-color: var(--primary-light);
-    color: var(--text-primary);
-    border-bottom-right-radius: var(--radius-sm);
-    margin-left: auto;
-}
-
-.bot-message {
-    align-self: flex-start;
-    background-color: var(--bot-msg-bg);
-    color: var(--text-primary);
-    border-bottom-left-radius: var(--radius-sm);
-    margin-right: auto;
-}
-
-/* 7. Fixed chat input at the bottom */
-.chat-input {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px var(--space-md);
-    background-color: #f9f9f9;
-    border-top: 1px solid var(--border-color);
-    z-index: 10;
-    display: flex;
-    align-items: center;
-}
-
-.chat-input input {
-    flex: 1;
-    height: 44px;
-    padding: 0 40px 0 15px;
-    border-radius: 22px;
-    border: 1px solid var(--border-color);
-    background-color: white;
-    font-size: 16px; /* Prevent iOS zoom on focus */
-}
-
-.chat-input button {
-    position: absolute;
-    right: calc(var(--space-md) + 5px);
-    width: 36px;
-    height: 36px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 8. iOS-specific fixes */
+/* ===== APPLE DEVICE FIXES ===== */
 @supports (-webkit-touch-callout: none) {
-    /* Force expand messages on iOS */
-    .message {
-        width: auto !important;
-        display: inline-block !important;
-    }
-    
-    .message-content {
-        display: inline !important;
-    }
-    
-    /* Fix for iOS Safari text sizing */
+    /* Fix Safari text sizing */
     body {
         -webkit-text-size-adjust: 100%;
     }
     
     /* Fix for iOS scroll bouncing */
     .chat-panel {
+        -webkit-overflow-scrolling: touch;
         -webkit-transform: translateZ(0);
-    }
-}
-
-/* 9. Handle iPhone X+ notch */
-@supports (padding: max(0px)) {
-    .chat-input {
-        padding-bottom: max(10px, env(safe-area-inset-bottom));
     }
     
     .chat-messages {
-        padding-bottom: calc(70px + env(safe-area-inset-bottom));
-    }
-}
-
-/* 10. Responsive adjustments */
-@media screen and (max-width: 480px) {
-    .message {
-        max-width: 90%;
-        font-size: 15px;
-        padding: 8px 12px;
+        -webkit-overflow-scrolling: touch;
     }
     
+    /* Fix font size in inputs */
+    input, textarea, select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Fix height calculation with keyboard */
     .chat-panel {
-        height: 80vh;
+        height: -webkit-fill-available;
+        max-height: 85vh;
     }
     
-    .chat-input {
-        padding: 8px 12px;
-    }
-    
-    .chat-input input {
-        height: 40px;
+    /* Fix bottom spacing for iPhone X+ with home indicator */
+    @supports (padding: max(0px)) {
+        .chat-input {
+            padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom, 0px));
+        }
+        
+        .chat-messages {
+            padding-bottom: max(60px, calc(60px + env(safe-area-inset-bottom, 0px)));
+        }
     }
 }
 
-/* 11. Fix analysis container in messages */
-.analysis-container {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    margin-top: 12px;
-    overflow: hidden;
-}
-
-/* 12. Ensure suggestions and feedback buttons display properly */
-.suggestion-chips, 
-.feedback-buttons {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
+/* ===== ANDROID SPECIFIC FIXES ===== */
+@supports not (-webkit-touch-callout: none) {
+    /* Android-specific adjustments if needed */
+    .chat-input input:focus {
+        font-size: 16px; /* Improves text input on some Android devices */
+    }
 }
