@@ -390,35 +390,88 @@ function showDetailModal(analysisData) {
                 <!-- Phần các sao -->
                 <h4 style="margin-top: 0; color: var(--primary-color);">Các Sao</h4>
                 <div class="stars-detail">
-                    ${analysisData.starSequence.length > 0 ? 
-                        analysisData.starSequence.map(star => `
-                            <div class="star-detail-item ${star.nature === 'Cát' ? 'cat' : star.nature === 'Hung' ? 'hung' : ''}">
-                                <div class="star-detail-name">${star.name}</div>
-                                <div class="star-detail-pair">${star.originalPair}</div>
-                                <div class="star-detail-nature">${star.nature}</div>
-                                <div class="star-detail-energy">Năng lượng: ${star.energyLevel}</div>
+                // Phần các sao
+                ${analysisData.starSequence.length > 0 ? 
+                    analysisData.starSequence.map(star => {
+                        const dotType = star.nature === 'Cát' ? 'cat' : 
+                                      (star.nature === 'Hung' ? 'hung' : 
+                                      (star.nature === 'Cát hóa hung' ? 'cat-hung' : 'neutral'));
+                        
+                        let energyDotsHTML = '';
+                        for (let i = 0; i < 4; i++) {
+                            energyDotsHTML += `<div class="energy-dot ${dotType} ${i < star.energyLevel ? 'active' : ''}"></div>`;
+                        }
+                        
+                        return `
+                        <div class="star-detail-item ${star.nature === 'Cát' ? 'cat' : star.nature === 'Hung' ? 'hung' : ''}">
+                            <div class="star-detail-name">${star.name}</div>
+                            <div class="star-detail-pair">${star.originalPair}</div>
+                            <div class="star-detail-nature">${star.nature}</div>
+                            <div class="star-detail-energy">
+                                <span>Năng lượng: ${star.energyLevel}/4</span>
+                                <div class="energy-indicator detail-energy">
+                                    ${energyDotsHTML}
+                                </div>
                             </div>
-                        `).join('') : 
-                        '<div class="empty-detail">Không có sao nào.</div>'
-                    }
+                        </div>
+                        `;
+                    }).join('') : 
+                    '<div class="empty-detail">Không có sao nào.</div>'
+                }
                 </div>
                 
                 <!-- Phần tổ hợp sao -->
                 <h4 style="margin-top: 20px; color: var(--primary-color);">Tổ Hợp Sao</h4>
                 <div class="star-combos-detail">
-                    ${analysisData.starCombinations.length > 0 ? 
-                        analysisData.starCombinations.map(combo => `
-                            <div class="star-combo-detail">
-                                <div class="combo-header">
-                                    <span class="${combo.firstStar && combo.firstStar.nature === 'Cát' ? 'auspicious' : (combo.firstStar && combo.firstStar.nature === 'Hung' ? 'inauspicious' : '')}">${combo.firstStar ? combo.firstStar.name : ''}</span>
-                                    <span class="plus">+</span>
-                                    <span class="${combo.secondStar && combo.secondStar.nature === 'Cát' ? 'auspicious' : (combo.secondStar && combo.secondStar.nature === 'Hung' ? 'inauspicious' : '')}">${combo.secondStar ? combo.secondStar.name : ''}</span>
-                                </div>
-                                <div class="combo-description">${combo.description || ''}</div>
+                // Phần tổ hợp sao
+                ${analysisData.starCombinations.length > 0 ? 
+                    analysisData.starCombinations.map(combo => {
+                        // Tính tổng năng lượng
+                        const firstStarEnergy = combo.firstStar ? combo.firstStar.energyLevel || 0 : 0;
+                        const secondStarEnergy = combo.secondStar ? combo.secondStar.energyLevel || 0 : 0;
+                        const totalEnergy = combo.totalEnergy || (firstStarEnergy + secondStarEnergy);
+                        
+                        // Xác định màu dựa vào tính chất
+                        const isPositive = combo.isPositive || 
+                                       (combo.firstStar && combo.secondStar && 
+                                        combo.firstStar.nature === 'Cát' && 
+                                        combo.secondStar.nature === 'Cát');
+                                        
+                        const isNegative = combo.isNegative || 
+                                       (combo.firstStar && combo.secondStar && 
+                                        combo.firstStar.nature === 'Hung' && 
+                                        combo.secondStar.nature === 'Hung');
+                                        
+                        const dotType = isPositive ? 'cat' : (isNegative ? 'hung' : 'mixed');
+                        
+                        // Tạo HTML cho dots
+                        let energyDotsHTML = '';
+                        const maxDots = 8;
+                        const energyLevel = Math.min(totalEnergy, maxDots);
+                        
+                        for (let i = 0; i < maxDots; i++) {
+                            energyDotsHTML += `<div class="energy-dot ${dotType} ${i < energyLevel ? 'active' : ''}"></div>`;
+                        }
+                        
+                        return `
+                        <div class="star-combo-detail">
+                            <div class="combo-header">
+                                <span class="${combo.firstStar && combo.firstStar.nature === 'Cát' ? 'auspicious' : (combo.firstStar && combo.firstStar.nature === 'Hung' ? 'inauspicious' : '')}">${combo.firstStar ? combo.firstStar.name : ''}</span>
+                                <span class="plus">+</span>
+                                <span class="${combo.secondStar && combo.secondStar.nature === 'Cát' ? 'auspicious' : (combo.secondStar && combo.secondStar.nature === 'Hung' ? 'inauspicious' : '')}">${combo.secondStar ? combo.secondStar.name : ''}</span>
                             </div>
-                        `).join('') : 
-                        '<div class="empty-detail">Không có tổ hợp sao nào.</div>'
-                    }
+                            <div class="combo-energy">
+                                <span>Tổng năng lượng: ${totalEnergy}</span>
+                                <div class="energy-indicator detail-energy">
+                                    ${energyDotsHTML}
+                                </div>
+                            </div>
+                            <div class="combo-description">${combo.description || ''}</div>
+                        </div>
+                        `;
+                    }).join('') : 
+                    '<div class="empty-detail">Không có tổ hợp sao nào.</div>'
+                }
                 </div>
                 
                 <!-- Phần tổ hợp số -->
