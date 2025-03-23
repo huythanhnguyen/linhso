@@ -1,0 +1,150 @@
+/* Fix hiển thị chat trên mobile */
+
+/* Reset tin nhắn */
+.message {
+    width: auto !important;
+    max-width: 85%;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+    line-height: 1.5;
+    
+    /* Đảm bảo ngắt từ đúng cách */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    
+    /* Tự động mở rộng chiều cao */
+    min-height: auto;
+    height: auto !important;
+    max-height: none !important;
+    
+    /* Sửa cách hiển thị */
+    display: inline-block;
+}
+
+/* Nội dung tin nhắn */
+.message-content {
+    /* Quan trọng cho việc ngắt dòng */
+    white-space: normal !important;
+    overflow: visible;
+    width: 100%;
+    display: inline !important;
+    
+    /* Tránh giới hạn kích thước */
+    min-height: auto;
+    height: auto !important;
+    max-height: none !important;
+    
+    /* Sửa kích thước văn bản */
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Tin nhắn người dùng */
+.user-message {
+    align-self: flex-end;
+    background-color: var(--primary-light);
+    color: var(--text-primary);
+    border-bottom-right-radius: var(--radius-sm);
+    margin-left: auto;
+}
+
+/* Tin nhắn bot */
+.bot-message {
+    align-self: flex-start;
+    background-color: var(--bot-msg-bg);
+    color: var(--text-primary);
+    border-bottom-left-radius: var(--radius-sm);
+    margin-right: auto;
+}
+
+/* Định dạng lại khu vực chat */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Chat panel */
+.chat-panel {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--chat-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+/* Sửa lỗi cho iOS */
+@supports (-webkit-touch-callout: none) {
+    /* Sửa vấn đề hiển thị tin nhắn trên iOS */
+    .message {
+        width: auto !important;
+        display: inline-block !important;
+    }
+    
+    .message-content {
+        display: inline !important;
+    }
+    
+    /* Sửa vấn đề về kích thước văn bản Safari iOS */
+    body {
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    /* Sửa lỗi cuộn trang */
+    .chat-panel {
+        -webkit-transform: translateZ(0);
+    }
+}
+
+/* Điều chỉnh cho màn hình nhỏ */
+@media screen and (max-width: 480px) {
+    .message {
+        max-width: 90%;
+        font-size: 15px;
+        padding: 8px 12px;
+    }
+    
+    .chat-panel {
+        height: 80vh;
+    }
+    
+    .chat-input {
+        padding: 8px 12px;
+    }
+    
+    .chat-input input {
+        height: 40px;
+    }
+    
+    /* Sửa vấn đề với phần phân tích */
+    .analysis-container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin-top: 12px;
+        overflow: hidden;
+    }
+    
+    /* Đảm bảo các nút gợi ý và phản hồi hiển thị đúng */
+    .suggestion-chips, 
+    .feedback-buttons {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+}
