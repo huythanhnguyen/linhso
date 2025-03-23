@@ -1287,3 +1287,101 @@ header p {
         opacity: 0;
     }
 }
+/* CSS cho hiển thị năng lượng */
+.energy-indicator {
+    display: flex;
+    gap: 3px;
+    margin-top: 3px;
+    align-items: center;
+}
+
+.energy-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-right: 5px;
+}
+
+.energy-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.energy-dot.active {
+    transform: scale(1.1);
+}
+
+/* Màu sắc cho các loại dot */
+.energy-dot.cat.active {
+    background-color: var(--auspicious-color, #4caf50);
+    box-shadow: 0 0 3px rgba(76, 175, 80, 0.5);
+}
+
+.energy-dot.hung.active {
+    background-color: var(--inauspicious-color, #f44336);
+    box-shadow: 0 0 3px rgba(244, 67, 54, 0.5);
+}
+
+.energy-dot.cat-hung.active {
+    background: linear-gradient(135deg, #4caf50, #f44336);
+    box-shadow: 0 0 3px rgba(244, 67, 54, 0.5);
+}
+
+.energy-dot.mixed.active {
+    background: linear-gradient(135deg, #4caf50, #f44336);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.energy-dot.neutral.active {
+    background-color: #9e9e9e;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Cải thiện hiển thị star item */
+.star-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    background-color: #f9f9f9;
+    margin-bottom: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.star-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.star-energy {
+    display: flex;
+    align-items: center;
+}
+
+/* Cải thiện hiển thị star combo */
+.star-combo-item {
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    background-color: #f9f9f9;
+    margin-bottom: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.star-combo-energy {
+    display: flex;
+    flex-direction: column;
+    margin: 8px 0;
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+    .energy-dot {
+        width: 6px;
+        height: 6px;
+    }
+}
