@@ -1,184 +1,438 @@
-/* CSS nâng cao cho tabs và nút đóng */
+/**
+ * Fixes CSS - Phone Analysis App
+ * CSS để sửa các lỗi cụ thể và tăng tính nhất quán cho app
+ */
 
-/* Cải thiện header của info panel */
-.info-panel-header {
+/* ===== CHAT DISPLAY FIXES ===== */
+
+/* Điều chỉnh bố cục chat cho tất cả thiết bị */
+.chat-panel {
+    /* Đảm bảo panel chiếm toàn bộ không gian khả dụng */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-    color: white;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-}
-
-.info-panel-header h3 {
-    font-size: 1.2rem;
-    margin: 0;
-    color: white;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-/* Nút đóng cải tiến */
-.close-button {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: white;
-    transition: all 0.2s ease;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    position: relative;
-}
-
-.close-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
-}
-
-.close-button:active {
-    transform: rotate(90deg) scale(0.9);
-}
-
-/* Tạo hiệu ứng X đẹp hơn */
-.close-button i {
-    font-size: 16px;
-}
-
-/* Cải thiện tabs */
-.info-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border-color);
-    background-color: white;
-    position: relative;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-}
-
-.info-tab-button {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    font-weight: 500;
+    flex-direction: column;
+    height: calc(100vh - 200px);
+    min-height: 500px;
+    max-height: 80vh;
     position: relative;
     overflow: hidden;
 }
 
-/* Hiệu ứng phát sáng khi hover */
-.info-tab-button:hover:not(.active) {
-    background-color: rgba(0, 0, 0, 0.02);
-    color: var(--primary-color);
-}
-
-/* Tab active với underline animation */
-.info-tab-button.active {
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.info-tab-button.active::after {
-    content: '';
-    position: absolute;
+/* Vấn đề chính: chat input cố định ở dưới cùng */
+.chat-input {
+    position: absolute; 
     bottom: 0;
     left: 0;
     right: 0;
-    height: 3px;
-    background: var(--primary-color);
-    animation: slideRight 0.3s ease-out forwards;
+    z-index: 50;
+    background-color: #f9f9f9;
+    border-top: 1px solid var(--border-color);
+    padding: var(--space-md) var(--space-lg);
+    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    align-items: center;
 }
 
-@keyframes slideRight {
-    from { transform: scaleX(0); transform-origin: left; }
-    to { transform: scaleX(1); transform-origin: left; }
+/* Đảm bảo khu vực tin nhắn có padding để không bị che bởi input */
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-lg);
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    height: 100%;
 }
 
-/* Hiệu ứng khi click vào tab */
-.info-tab-button:active {
-    background-color: rgba(0, 0, 0, 0.05);
+/* Đảm bảo kích thước và định dạng bubble chat đúng */
+.message {
+    width: auto !important;
+    max-width: 70%;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+    line-height: 1.5;
+    border: 1px solid var(--border-color);
+    
+    /* Đảm bảo ngắt từ đúng cách */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    
+    /* Tự động mở rộng chiều cao */
+    min-height: auto;
+    height: auto !important;
+    max-height: none !important;
+    
+    /* Hiển thị đúng */
+    display: inline-block;
 }
 
-/* Hiệu ứng ripple khi click */
-.info-tab-button .ripple {
-    position: absolute;
-    background: rgba(var(--primary-color-rgb), 0.2);
+/* Nội dung tin nhắn */
+.message-content {
+    /* Quan trọng cho việc ngắt dòng */
+    white-space: normal !important;
+    overflow: visible;
+    width: 100%;
+    display: inline !important;
+    
+    /* Tránh giới hạn kích thước */
+    min-height: auto;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Typing Indicator Fix */
+.typing-indicator.hidden {
+    display: none !important;
+}
+
+/* ===== INFO PANEL FIXES ===== */
+
+/* Cải thiện hiển thị tabs trong info panel */
+.info-tabs {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.info-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.info-tab-button {
+    flex: 1;
+    min-width: 80px;
+    white-space: nowrap;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.info-tab-button.active {
+    border-bottom-color: var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 600;
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+/* ===== ANALYSIS CONTAINER FIXES ===== */
+
+/* Đảm bảo analysis container hiển thị đúng */
+.analysis-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.star-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.energy-levels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Fix cho Star Combinations */
+.star-combinations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.star-combo-item {
+    background-color: #f9f9fa;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border-left: 2px solid #ddd;
+}
+
+.star-combo-header {
+    display: flex;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
+
+/* ===== SUGGESTION CHIPS & FEEDBACK BUTTONS FIXES ===== */
+
+/* Đảm bảo các nút gợi ý và phản hồi hiển thị đúng */
+.suggestion-chips, 
+.feedback-buttons {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Fix hiển thị Feedback thanks */
+.feedback-thanks {
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* ===== LOADER FIXES ===== */
+
+/* Cải thiện màn hình loading */
+#loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--background-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    transform: scale(0);
-    animation: ripple 0.6s linear;
-    pointer-events: none;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
 }
 
-@keyframes ripple {
-    to {
-        transform: scale(2.5);
-        opacity: 0;
+/* ===== VISIBILITY & DISPLAY FIXES ===== */
+
+/* Đảm bảo ẩn đúng */
+.hidden {
+    display: none !important;
+}
+
+/* Đảm bảo hiển thị đúng overlay */
+.overlay.visible {
+    display: block !important;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Đảm bảo hiển thị đúng info panel */
+.info-panel.visible {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+}
+
+/* ===== SPECIFIC IOS/SAFARI FIXES ===== */
+
+@supports (-webkit-touch-callout: none) {
+    /* Sửa lỗi cụ thể cho iOS */
+    
+    /* Sửa lỗi hiển thị tin nhắn trên iOS */
+    .message {
+        width: auto !important;
+        display: inline-block !important;
+    }
+    
+    .message-content {
+        display: inline !important;
+    }
+    
+    /* Sửa kích thước văn bản Safari iOS */
+    body {
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    /* Sửa lỗi cuộn trang iOS */
+    .chat-panel, .chat-messages {
+        -webkit-transform: translateZ(0);
+    }
+    
+    /* Sửa lỗi hiển thị trong viewport khi bàn phím hiển thị */
+    @media (max-height: 600px) {
+        .chat-panel {
+            height: 80vh;
+            max-height: -webkit-fill-available;
+        }
+    }
+    
+    /* Sửa lỗi khi có notch trên iPhone */
+    @supports (padding: max(0px)) {
+        .chat-input {
+            padding-bottom: max(var(--space-md), calc(var(--space-md) + env(safe-area-inset-bottom)));
+        }
+        
+        .chat-messages {
+            padding-bottom: max(70px, calc(70px + env(safe-area-inset-bottom)));
+        }
     }
 }
 
-/* Hiệu ứng xuất hiện cho nội dung tab */
-.info-tab-content.active {
-    animation: fadeIn 0.3s ease-out, slideUp 0.3s ease-out;
+/* ===== WEBKIT-SPECIFIC FIXES ===== */
+
+/* Cải thiện thanh cuộn cho Webkit */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
 
-/* Cải thiện phần content */
-.info-tab-content {
-    padding: 16px;
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* ===== ACCESSIBILITY FIXES ===== */
+
+/* Cải thiện truy cập */
+button, input, a {
+    touch-action: manipulation; /* Tối ưu hóa touch events */
+}
+
+input, textarea, select, button {
+    font-size: 16px; /* Tránh auto-zoom trên iOS */
+}
+
+/* ===== FALLBACK FIXES ===== */
+
+/* Class hiệu ứng khi focus vào tin nhắn */
+.message:focus-within {
+    box-shadow: 0 0 0 2px var(--primary-color);
+    outline: none;
+}
+
+/* Sửa lỗi khi JavaScript không hoạt động đúng */
+.js-fallback .chat-input {
+    position: static;
+    bottom: auto;
+}
+
+.js-fallback .chat-messages {
     max-height: 60vh;
     overflow-y: auto;
-    background-color: white;
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    padding-bottom: var(--space-lg);
 }
 
-/* Thanh cuộn tùy chỉnh */
-.info-tab-content::-webkit-scrollbar {
-    width: 6px;
+/* ===== ANIMATION PERFORMANCE FIXES ===== */
+
+/* Tối ưu hiệu suất animation */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
-.info-tab-content::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 10px;
+/* Tối ưu hóa CPU/GPU */
+.chat-messages, .message, .analysis-container {
+    will-change: transform; /* Nâng cao hiệu suất animation */
+    transform: translateZ(0); /* Kích hoạt hardware acceleration */
 }
 
-.info-tab-content::-webkit-scrollbar-thumb {
-    background: rgba(var(--primary-color-rgb), 0.2);
-    border-radius: 10px;
+/* ===== Z-INDEX HIERARCHY ===== */
+
+/* Đảm bảo thứ tự hiển thị đúng */
+#loading-container { z-index: 9999; }
+.overlay { z-index: 999; }
+.info-panel { z-index: 900; }
+.chat-input { z-index: 50; }
+.chat-header { z-index: 40; }
+.chat-messages { z-index: 30; }
+
+/* ===== TOUCH SCREEN OPTIMIZATIONS ===== */
+
+/* Tối ưu cho màn hình cảm ứng */
+.category-btn,
+.feedback-btn,
+.chat-input button,
+.close-button,
+.chat-tools button {
+    min-height: 44px; /* Kích thước tối thiểu cho các phần tử có thể chạm */
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.info-tab-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--primary-color-rgb), 0.3);
+/* Đảm bảo không có text selection không mong muốn */
+.chat-header,
+.info-panel-header,
+.chat-tools button,
+.category-btn,
+.feedback-btn {
+    -webkit-user-select: none;
+    user-select: none;
 }
 
-/* Script để thêm hiệu ứng Ripple */
-/* Thêm đoạn mã JavaScript này vào file JS của bạn */
-/*
-document.addEventListener('DOMContentLoaded', function() {
-    const buttons = document.querySelectorAll('.info-tab-button');
+/* ===== INPUT INTERACTION IMPROVEMENTS ===== */
+
+/* Hiển thị theo kiểu iOS */
+@media (max-width: 768px) {
+    .chat-input {
+        display: flex;
+        align-items: center;
+        background-color: #f9f9f9;
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
     
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple');
-            this.appendChild(ripple);
-            
-            const x = e.clientX - e.target.getBoundingClientRect().left;
-            const y = e.clientY - e.target.getBoundingClientRect().top;
-            
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-});
-*/
+    .chat-input input {
+        border-radius: 20px;
+        padding-left: 16px;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-input button {
+        right: 16px;
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Nâng cao trải nghiệm khi focus vào input */
+.chat-input input:focus {
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== CLASS RIÊNG DÀNH CHO SCRIPT FIX ===== */
+
+/* Sửa khi chế độ landscape */
+.landscape-mode .chat-panel {
+    height: 60vh;
+}
+
+/* Sửa khi bàn phím hiển thị */
+.keyboard-visible .chat-panel {
+    height: 50vh;
+}
+
+/* Sửa khi màn hình nhỏ */
+.small-screen .chat-panel {
+    height: 85vh;
+}
