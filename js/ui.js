@@ -781,10 +781,12 @@ window.UI = {};
             
             messageDiv.id = messageId;
             
-            const messageContentDiv = messageDiv.querySelector('.message-content');
-            if (messageContentDiv) {
-                messageContentDiv.textContent = text;
-            }
+         const messageContentDiv = messageDiv.querySelector('.message-content');
+                if (messageContentDiv) {
+                    // Định dạng văn bản để dễ đọc hơn
+                    const formattedText = formatBotMessage(text);
+                    messageContentDiv.innerHTML = formattedText;
+                }
             
             chatMessages.appendChild(messageElement);
             scrollToBottom();
@@ -795,7 +797,28 @@ window.UI = {};
             return null;
         }
     }
-    
+    /**
+     * Hàm mới để định dạng nội dung tin nhắn bot
+     */
+    function formatBotMessage(text) {
+        if (!text) return '';
+        
+        // Thay thế định dạng đậm **text** bằng thẻ <strong>
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Chia thành các đoạn
+        formattedText = formattedText.split('\n\n').map(paragraph => {
+            if (!paragraph.trim()) return '';
+            return `<p>${paragraph}</p>`;
+        }).join('');
+        
+        // Xử lý danh sách nếu có
+        formattedText = formattedText.replace(/<p>- (.*?)<\/p>/g, '<li>$1</li>');
+        formattedText = formattedText.replace(/<li>(.*?)<\/li>/g, '<ul><li>$1</li></ul>');
+        formattedText = formattedText.replace(/<\/ul><ul>/g, '');
+        
+        return formattedText;
+    }
     /**
      * Add a bot message to the chat
      * @param {string} text - Message content
