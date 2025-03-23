@@ -848,7 +848,8 @@ window.UI = {};
             
             const messageContentDiv = messageDiv.querySelector('.message-content');
             if (messageContentDiv) {
-                messageContentDiv.textContent = text;
+                const formattedText = formatBotMessage(text);
+                messageContentDiv.innerHTML = formattedText;
             }
             
             // Add feedback buttons
@@ -858,19 +859,6 @@ window.UI = {};
             }
             
             if (analysisData) {
-                // Thêm nút gợi ý câu hỏi
-                const suggestionText = document.createElement('div');
-                suggestionText.className = 'suggestion-text';
-                suggestionText.innerHTML = '<p>Bạn có thể hỏi thêm về:</p>';
-                messageDiv.appendChild(suggestionText);
-                
-                // Thêm ví dụ câu hỏi có thể hỏi
-                const questionExamples = [
-                    "Số này ảnh hưởng thế nào đến sự nghiệp của tôi?",
-                    "Mối quan hệ với người khác có tốt không?",
-                    "Số này có phải là số may mắn không?",
-                    "Tôi có nên giữ số điện thoại này không?"
-                ];
                 
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'question-examples';
