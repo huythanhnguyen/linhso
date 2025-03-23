@@ -55,7 +55,36 @@ const API = (function() {
             
             // Clear timeout
             clearTimeout(timeoutId);
-            
+            // Check for authentication errors 
+            if (response.status === 401) {
+                // Token không hợp lệ hoặc đã hết hạn
+                debug('Authentication error: 401 Unauthorized');
+                
+                // Phát sự kiện thông báo lỗi xác thực
+                const authErrorEvent = new CustomEvent('authError', {
+                    detail: { 
+                        message: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
+                        endpoint: endpoint
+                    }
+                });
+                document.dispatchEvent(authErrorEvent);
+                
+                // Thực hiện đăng xuất (không gọi API)
+                if (window.Auth && typeof window.Auth.logout === 'function') {
+                    // Tham số false để không gọi API logout
+                    await window.Auth.logout(false);
+                } else {
+                    // Phương án dự phòng nếu không có Auth module
+                    removeAuthToken();
+                    removeUser();
+                }
+                
+                const error = new Error('Phiên đăng nhập đã hết hạn');
+                error.status = 401;
+                error.isAuthError = true;
+                throw error;
+            }
+
             // Parse the response
             const responseData = await response.json();
             
