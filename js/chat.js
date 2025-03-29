@@ -34,74 +34,40 @@ function init() {
 }
     
     /**
-     * Process user input (message or phone number)
-     * @param {string} input - User input text
-     */
-    async function processUserInput(input) {
-        if (state.processingInput) return;
-        
-        state.processingInput = true;
-        
-        // Show typing indicator
-        UI.showTypingIndicator();
-        
-        try {
-            // Check if input is a phone number
-            if (isPhoneNumber(input)) {
-                await processPhoneNumber(input);
-            } else {
-                // Đây là một câu hỏi hoặc lệnh khác
-                await processQuestion(input);
-            }
-        } catch (error) {
-            debug('Error processing input:', error);
-            UI.addBotMessage('Xin lỗi, đã xảy ra lỗi khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.');
-        } finally {
-            // Hide typing indicator
-            UI.hideTypingIndicator();
-            
-            // Reset processing state
-            state.processingInput = false;
-        }
-    }
-    
-    /**
-     * Check if input is a phone number
-     * @param {string} input - User input text
-     * @returns {boolean} Whether input is a phone number
-     */
-/**
- * Check if input is a phone number
+ * Process user input (message or phone number)
  * @param {string} input - User input text
- * @returns {boolean} Whether input is a phone number
  */
-function isPhoneNumber(input) {
-    // Nếu đầu vào dài hơn 20 ký tự, có thể đây là câu hỏi chứ không phải số điện thoại
-    if (input.length > 20) return false;
+async function processUserInput(input) {
+    if (state.processingInput) return;
     
-    // Remove any non-digit characters
-    const cleaned = input.replace(/\D/g, '');
+    state.processingInput = true;
     
-    // Nếu đầu vào chứa quá nhiều ký tự không phải số, có thể đây là câu hỏi
-    if (cleaned.length < input.length * 0.7) return false;
+    // Show typing indicator
+    UI.showTypingIndicator();
     
-    // Vietnamese phone numbers typically start with 0 and have 10-11 digits
-    const phoneRegex = /^0\d{9,10}$/;
-    
-    return phoneRegex.test(cleaned);
+    try {
+        // Gửi tất cả input đến xử lý, không cần kiểm tra loại input
+        await processPhoneNumber(input);
+    } catch (error) {
+        debug('Error processing input:', error);
+        UI.addBotMessage('Xin lỗi, đã xảy ra lỗi khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.');
+    } finally {
+        // Hide typing indicator
+        UI.hideTypingIndicator();
+        
+        // Reset processing state
+        state.processingInput = false;
+    }
 }
     
-  /**
- * Process a phone number
- * @param {string} phoneNumber - Phone number to process
+/**
+ * Process a phone number or any user input
+ * @param {string} input - User input to process
  */
-async function processPhoneNumber(phoneNumber) {
+async function processPhoneNumber(input) {
     try {
-        // Clean the phone number
-        const cleanedNumber = phoneNumber.replace(/\D/g, '');
-        
-        // Request analysis from the API
-        const response = await API.analyzePhoneNumber(cleanedNumber);
+        // Gửi trực tiếp input đến API mà không cần validate hay normalize
+        const response = await API.analyzePhoneNumber(input);
         debug('API Response:', response);
         
         if (response.success) {
@@ -116,9 +82,15 @@ async function processPhoneNumber(phoneNumber) {
             } else if (typeof analysisData === 'string') {
                 // Nếu dữ liệu là chuỗi, sử dụng nó làm kết quả phân tích
                 interpretation = analysisData;
+            } else if (analysisData && analysisData.answer) {
+                // Kiểm tra nếu đây là câu trả lời cho câu hỏi
+                interpretation = analysisData.answer;
+            } else if (response.data && response.data.answer) {
+                // Cấu trúc phản hồi khác
+                interpretation = response.data.answer;
             } else {
                 // Tạo phân tích tổng quát nếu không có kết quả chi tiết
-                interpretation = `Đã phân tích số điện thoại ${cleanedNumber}. Đây là kết quả phân tích theo phương pháp Tứ Cát Tứ Hung.`;
+                interpretation = `Đã phân tích nội dung "${input}". Đây là kết quả phân tích.`;
             }
             
             // Add message with analysis data
@@ -127,16 +99,17 @@ async function processPhoneNumber(phoneNumber) {
             // Add to conversation history
             addToHistory('assistant', interpretation, analysisData);
         } else {
-            const errorMsg = response.message || 'Không thể phân tích số điện thoại. Vui lòng thử lại.';
+            const errorMsg = response.message || 'Không thể phân tích nội dung. Vui lòng thử lại.';
             UI.addBotMessage(errorMsg);
             addToHistory('assistant', errorMsg);
         }
     } catch (error) {
-        debug('Error analyzing phone number:', error);
-        UI.addBotMessage('Xin lỗi, đã xảy ra lỗi khi phân tích số điện thoại. Vui lòng thử lại sau.');
-        addToHistory('assistant', 'Xin lỗi, đã xảy ra lỗi khi phân tích số điện thoại. Vui lòng thử lại sau.');
+        debug('Error analyzing input:', error);
+        UI.addBotMessage('Xin lỗi, đã xảy ra lỗi khi phân tích. Vui lòng thử lại sau.');
+        addToHistory('assistant', 'Xin lỗi, đã xảy ra lỗi khi phân tích. Vui lòng thử lại sau.');
     }
 }
+
 async function processQuestion(question) {
     try {
         // Check if we have a current analysis for context

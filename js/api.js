@@ -227,16 +227,14 @@ const API = (function() {
     // Analysis API
     
     /**
-     * Analyze a phone number
-     * @param {string} phoneNumber - Phone number to analyze
+     * Analyze a phone number or any input
+     * @param {string} input - User input to analyze
      * @returns {Promise} Analysis response
      */
-    async function analyzePhoneNumber(phoneNumber) {
+    async function analyzePhoneNumber(input) {
         try {
-            // Normalize phone number by removing non-digit characters
-            const normalizedNumber = phoneNumber.replace(/\D/g, '');
-            
-            const response = await request(CONFIG.ANALYSIS.ANALYZE, 'POST', { phoneNumber: normalizedNumber });
+            // Gửi input trực tiếp mà không xử lý
+            const response = await request(CONFIG.ANALYSIS.ANALYZE, 'POST', { phoneNumber: input });
             debug('Received analysis response:', response);
             return response;
         } catch (error) {
