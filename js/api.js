@@ -243,14 +243,10 @@ const API = (function() {
         }
     }
     
-    /**
-     * Get analysis history
-     * @returns {Promise} Analysis history
-     */
   /**
- * Get analysis history with detailed error handling and logging
- * @param {number} limit - Optional limit for number of records to retrieve
- * @param {number} page - Optional page number for pagination
+ * Get analysis history with comprehensive error handling
+ * @param {number} limit - Maximum number of records to retrieve
+ * @param {number} page - Page number for pagination
  * @returns {Promise} Analysis history object with data property containing records
  */
 async function getAnalysisHistory(limit = 20, page = 1) {
@@ -279,6 +275,13 @@ async function getAnalysisHistory(limit = 20, page = 1) {
             console.error('Empty response from history API');
             return { success: false, message: 'Không nhận được dữ liệu từ server', data: [] };
         }
+        
+        // ===== THÊM MỚI: Chuẩn hóa dữ liệu, chuyển history -> data =====
+        if (response.success && response.history && Array.isArray(response.history)) {
+            response.data = response.history;
+            console.log(`Normalized API response: Mapped 'history' array (${response.history.length} items) to 'data'`);
+        }
+        // ================================================================
         
         // Đảm bảo response có định dạng chuẩn
         if (!response.success && !response.data) {
