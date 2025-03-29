@@ -274,19 +274,92 @@ const API = (function() {
         });
     }
     
-    /**
-     * Ask a question about a phone number
-     * @param {string} phoneNumber - Phone number context
-     * @param {string} question - User's question
-     * @returns {Promise} Question response
-     */
-    async function askQuestion(phoneNumber, question) {
-        return await request(CONFIG.ANALYSIS.QUESTION, 'POST', {
-            phoneNumber,
-            question
-        });
+/**
+ * Ask a question about a phone number with enhanced capabilities
+ * @param {string|object} options - Phone number or options object
+ * @param {string} [questionText] - User's question when first param is phoneNumber
+ * @returns {Promise} Question response
+ * 
+ * Examples:
+ * // Cú pháp cũ (vẫn được hỗ trợ)
+ * askQuestion("0912345678", "Số này có ý nghĩa gì?");
+ * 
+ * // Cú pháp mới - câu hỏi chung
+ * askQuestion({
+ *   question: "Số 8 có ý nghĩa gì trong chiêm tinh học số?",
+ *   type: "general"
+ * });
+ * 
+ * // Câu hỏi theo dõi (follow-up)
+ * askQuestion({
+ *   question: "Làm sao để cải thiện tình trạng này?",
+ *   phoneNumber: "0912345678", // tùy chọn
+ *   type: "followup"
+ * });
+ * 
+ * // So sánh các số điện thoại
+ * askQuestion({
+ *   question: "Số nào tốt hơn cho kinh doanh?",
+ *   phoneNumbers: ["0912345678", "0987654321"],
+ *   type: "compare"
+ * });
+ */
+async function askQuestion(options, questionText) {
+    try {
+        // Xử lý cú pháp cũ: askQuestion(phoneNumber, question)
+        if (typeof options === 'string') {
+            return await request(CONFIG.ANALYSIS.QUESTION, 'POST', {
+                phoneNumber: options,
+                question: questionText,
+                type: 'question'
+            });
+        }
+        
+        // Xử lý cú pháp mới: askQuestion({...})
+        const payload = {
+            question: options.question,
+            type: options.type || 'question'
+        };
+        
+        // Thêm các tham số tùy theo loại câu hỏi
+        switch (payload.type) {
+            case 'question':
+                payload.phoneNumber = options.phoneNumber;
+                break;
+                
+            case 'followup':
+                // Có thể thêm phoneNumber tùy chọn để chỉ định context
+                if (options.phoneNumber) {
+                    payload.phoneNumber = options.phoneNumber;
+                }
+                break;
+                
+            case 'compare':
+                if (!options.phoneNumbers || !Array.isArray(options.phoneNumbers)) {
+                    throw new Error('Cần cung cấp mảng phoneNumbers để so sánh');
+                }
+                payload.phoneNumbers = options.phoneNumbers;
+                break;
+                
+            case 'general':
+                // Không cần tham số đặc biệt
+                break;
+                
+            default:
+                debug('Không nhận dạng được loại câu hỏi, sử dụng mặc định: question');
+                payload.type = 'question';
+                if (options.phoneNumber) {
+                    payload.phoneNumber = options.phoneNumber;
+                }
+        }
+        
+        debug('Sending question with payload:', payload);
+        return await request(CONFIG.ANALYSIS.QUESTION, 'POST', payload);
+    } catch (error) {
+        debug('Error in askQuestion API call:', error);
+        throw error;
     }
-    
+}
     /**
      * Get recent analyses for the current user
      * @param {number} limit - Maximum number of items to return
