@@ -1663,3 +1663,107 @@ header p {
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
+/* CSS để làm info panel và tab lịch sử tràn đầy màn hình */
+.info-panel {
+    height: calc(100vh - 200px); /* Điều chỉnh chiều cao tùy theo header của bạn */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 100vh;
+}
+
+.info-tabs {
+    flex-shrink: 0; /* Ngăn tabs co lại */
+}
+
+.info-tab-content {
+    flex: 1;
+    overflow-y: auto;
+    display: none;
+    padding: var(--space-md);
+    max-height: none !important; /* Ghi đè giới hạn chiều cao trước đó */
+    height: 100%; /* Chiếm toàn bộ không gian còn lại */
+}
+
+.info-tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+#history-tab {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-header {
+    flex-shrink: 0;
+    margin-bottom: var(--space-md);
+}
+
+.analysis-history-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: var(--space-md);
+}
+
+/* Đảm bảo các mục lịch sử hiển thị đúng */
+.history-item {
+    margin-bottom: var(--space-sm);
+}
+
+/* Khắc phục vấn đề hiển thị trên thiết bị di động */
+@media (max-width: 992px) {
+    .info-panel {
+        height: 100vh;
+        max-height: none;
+    }
+}
+.load-more-btn {
+    display: block;
+    width: 100%;
+    padding: var(--space-md);
+    margin-top: var(--space-md);
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--font-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: center;
+}
+
+.load-more-btn:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+}
+
+.load-more-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Đảm bảo container lịch sử hiển thị đúng */
+.analysis-history-container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: var(--space-lg);
+}
+/* Đảm bảo tab content hiển thị đúng cách */
+.info-tab-content {
+    display: none !important; /* !important để ghi đè các styles khác */
+    padding: var(--space-md);
+    overflow-y: auto;
+}
+
+.info-tab-content.active {
+    display: block !important;
+}
+
+/* Đảm bảo analysis-history-container chỉ hiển thị trong tab history */
+#account-tab .analysis-history-container {
+    display: none !important;
+}

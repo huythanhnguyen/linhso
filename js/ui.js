@@ -43,50 +43,110 @@ window.UI = {};
         enhanceChatDisplay();
     }
 
-    /**
-     * Load and display analysis history
-     */
-    async function loadAnalysisHistory() {
-        try {
-            // Kiểm tra xác thực trước khi gọi API
-            if (!isAuthenticated()) {
-                debug('Not loading history - user not authenticated');
-                return;
-            }
-    
-            const historyContainer = document.getElementById('analysis-history');
-            if (historyContainer) {
-                // Hiển thị thông báo đang tải
-                historyContainer.innerHTML = '<div class="empty-history-message">Đang tải lịch sử...</div>';
-            }
-    
-            // Gọi hàm API mới với tham số (giới hạn 20 mục lịch sử)
-            const historyResponse = await API.getAnalysisHistory(20, 1);
-            
-            // Kiểm tra kết quả
-            if (!historyResponse.success) {
-                debug('Error loading history:', historyResponse.message);
-                if (historyContainer) {
-                    historyContainer.innerHTML = `<div class="empty-history-message">Không thể tải lịch sử: ${historyResponse.message}</div>`;
-                }
-                return;
-            }
-            
-            // Cập nhật state với dữ liệu lịch sử
-            state.analysisHistory = historyResponse.data || [];
-            debug(`Loaded ${state.analysisHistory.length} history items`);
-            
-            // Hiển thị lịch sử
-            renderAnalysisHistory();
-            
-        } catch (error) {
-            debug('Error in loadAnalysisHistory:', error);
-            const historyContainer = document.getElementById('analysis-history');
-            if (historyContainer) {
-                historyContainer.innerHTML = '<div class="empty-history-message">Không thể tải lịch sử. Vui lòng thử lại sau.</div>';
+/**
+ * Load and display analysis history
+ * @param {number} page - Page number to load
+ * @param {boolean} append - Whether to append to existing history
+ */
+async function loadAnalysisHistory(page = 1, append = false) {
+    try {
+        // Kiểm tra xác thực trước khi gọi API
+        if (!isAuthenticated()) {
+            debug('Not loading history - user not authenticated');
+            return;
+        }
+
+        const historyContainer = document.getElementById('analysis-history');
+        
+        // Hiển thị thông báo đang tải
+        if (historyContainer && !append) {
+            historyContainer.innerHTML = '<div class="empty-history-message">Đang tải lịch sử...</div>';
+        }
+        
+        // Hiển thị trạng thái loading cho nút Load More nếu có
+        if (append) {
+            const loadMoreBtn = document.getElementById('load-more-history');
+            if (loadMoreBtn) {
+                loadMoreBtn.textContent = 'Đang tải...';
+                loadMoreBtn.disabled = true;
             }
         }
+
+        // Xác định số mục cần tải (mặc định 20 nếu pagination chưa được khởi tạo)
+        const limit = (state.historyPagination && state.historyPagination.limit) || 20;
+        
+        // Gọi API với tham số phân trang
+        const historyResponse = await API.getAnalysisHistory(limit, page);
+        
+        // Khởi tạo historyPagination nếu chưa có
+        if (!state.historyPagination) {
+            state.historyPagination = {
+                currentPage: 1,
+                totalPages: 1,
+                limit: 20,
+                total: 0
+            };
+        }
+        
+        // Cập nhật thông tin phân trang
+        if (historyResponse.success && historyResponse.pagination) {
+            state.historyPagination = {
+                currentPage: page,
+                totalPages: historyResponse.pagination.pages || 1,
+                limit: historyResponse.pagination.limit || 20,
+                total: historyResponse.pagination.total || 0
+            };
+        }
+        
+        // Xử lý dữ liệu
+        if (historyResponse.success && historyResponse.data && historyResponse.data.length > 0) {
+            if (append) {
+                // Nếu append, thêm vào danh sách hiện tại
+                state.analysisHistory = [...state.analysisHistory, ...historyResponse.data];
+            } else {
+                // Nếu không, thay thế hoàn toàn
+                state.analysisHistory = historyResponse.data;
+            }
+            
+            // Render lịch sử
+            renderAnalysisHistory(append);
+        } else if (!append) {
+            // Nếu không có dữ liệu và không phải append
+            if (historyContainer) {
+                historyContainer.innerHTML = '<div class="empty-history-message">Chưa có lịch sử phân tích.</div>';
+            }
+        }
+        
+        // Reset trạng thái nút Load More
+        const loadMoreBtn = document.getElementById('load-more-history');
+        if (loadMoreBtn) {
+            loadMoreBtn.textContent = 'Tải thêm';
+            loadMoreBtn.disabled = false;
+            
+            // Ẩn nút nếu đã tải hết
+            if (state.historyPagination.currentPage >= state.historyPagination.totalPages) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
+        }
+        
+    } catch (error) {
+        debug('Error loading history:', error);
+        
+        const historyContainer = document.getElementById('analysis-history');
+        if (historyContainer && !append) {
+            historyContainer.innerHTML = '<div class="empty-history-message">Không thể tải lịch sử. Vui lòng thử lại sau.</div>';
+        }
+        
+        // Reset trạng thái nút Load More khi lỗi
+        const loadMoreBtn = document.getElementById('load-more-history');
+        if (loadMoreBtn) {
+            loadMoreBtn.textContent = 'Tải thêm';
+            loadMoreBtn.disabled = false;
+        }
     }
+}
     
     /**
      * Set up all event listeners
@@ -127,7 +187,19 @@ window.UI = {};
                 }
             });
         }
-        
+        // UI state
+        const state = {
+            loading: false,
+            currentAnalysis: null,
+            analysisHistory: [],
+            isInfoPanelVisible: false,
+            historyPagination: { // Thêm đối tượng pagination
+                currentPage: 1,
+                totalPages: 1,
+                limit: 20,
+                total: 0
+            }
+        };
         // Logout button
         const logoutButton = document.getElementById('logout-btn');
         if (logoutButton) {
@@ -249,9 +321,32 @@ window.UI = {};
             targetContent.classList.add('active');
         }
         
-        // Tải lại lịch sử nếu tab là history và người dùng đã đăng nhập
+        // THÊM: Di chuyển lịch sử phân tích về đúng tab
+        if (tabName === 'account') {
+            // Xóa history container nếu vô tình được thêm vào tab account
+            const historyInAccountTab = document.querySelector('#account-tab .analysis-history-container');
+            if (historyInAccountTab) {
+                historyInAccountTab.remove();
+            }
+            
+            // Đảm bảo analysis-history nằm trong history-tab
+            const analysisHistory = document.getElementById('analysis-history');
+            const historyTab = document.getElementById('history-tab');
+            
+            if (analysisHistory && historyTab && analysisHistory.parentElement !== historyTab) {
+                const existingHistory = historyTab.querySelector('#analysis-history');
+                if (!existingHistory) {
+                    historyTab.appendChild(analysisHistory);
+                }
+            }
+        }
+        
+        // Tải lịch sử nếu chuyển đến tab history
         if (tabName === 'history' && isAuthenticated()) {
-            loadAnalysisHistory();
+            if (state.historyPagination) {
+                state.historyPagination.currentPage = 1;
+            }
+            loadAnalysisHistory(1, false);
         }
     }
     
@@ -1223,32 +1318,46 @@ function addBotMessage(text, analysisData = null) {
         }
     }
     
-    /**
-     * Render analysis history
-     */
-    /**
+/**
  * Render analysis history
+ * @param {boolean} append - Whether to append to existing history
  */
-function renderAnalysisHistory() {
+function renderAnalysisHistory(append = false) {
     const historyContainer = document.getElementById('analysis-history');
     if (!historyContainer) return;
     
-    // Clear container
-    historyContainer.innerHTML = '';
+    // Nếu không phải append, xóa nội dung cũ
+    if (!append) {
+        historyContainer.innerHTML = '';
+    } else {
+        // Nếu append, xóa nút Load More cũ
+        const oldLoadMoreBtn = document.getElementById('load-more-history');
+        if (oldLoadMoreBtn) {
+            oldLoadMoreBtn.remove();
+        }
+    }
     
-    // Check if history is empty
+    // Kiểm tra lịch sử trống
     if (!state.analysisHistory || state.analysisHistory.length === 0) {
         historyContainer.innerHTML = '<div class="empty-history-message">Chưa có lịch sử phân tích.</div>';
         return;
     }
     
-    // Sắp xếp lịch sử theo thời gian, mới nhất lên đầu
-    const sortedHistory = [...state.analysisHistory].sort((a, b) => {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-    });
+    // Lấy các mục cần hiển thị
+    const displayHistory = append ? state.analysisHistory : 
+        [...state.analysisHistory].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
-    // Add history items
-    sortedHistory.forEach(analysis => {
+    if (!append) {
+        // Cập nhật state nếu không phải append
+        state.analysisHistory = displayHistory;
+    }
+    
+    // Hiển thị các mục lịch sử
+    const startIndex = append ? displayHistory.length - state.historyPagination.limit : 0;
+    const itemsToDisplay = append ? 
+        displayHistory.slice(startIndex) : displayHistory;
+    
+    itemsToDisplay.forEach(analysis => {
         const historyTemplate = document.getElementById('history-item-template');
         if (!historyTemplate) return;
         
@@ -1261,7 +1370,9 @@ function renderAnalysisHistory() {
         // Format date
         const date = new Date(analysis.createdAt);
         
-        // Tạo thành phần thời gian và thông tin cân bằng
+        // Phần code tạo các phần tử thời gian và thông tin tiếp theo
+        // (giữ nguyên code hiện tại của bạn)
+        
         const timeContainer = historyItem.querySelector('.history-time');
         timeContainer.innerHTML = '';
         
@@ -1325,13 +1436,9 @@ function renderAnalysisHistory() {
         
         // Add click handler
         historyItem.addEventListener('click', () => {
-            // Add user message with the phone number
             addUserMessage(analysis.phoneNumber);
-            
-            // Process the phone number
             Chat.processUserInput(analysis.phoneNumber);
             
-            // Close info panel on mobile
             if (window.innerWidth <= 992) {
                 closeInfoPanel();
             }
@@ -1339,6 +1446,19 @@ function renderAnalysisHistory() {
         
         historyContainer.appendChild(historyElement);
     });
+    
+    // Thêm nút Load More nếu còn trang để tải
+    if (state.historyPagination.currentPage < state.historyPagination.totalPages) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'load-more-history';
+        loadMoreBtn.className = 'load-more-btn';
+        loadMoreBtn.textContent = 'Tải thêm';
+        loadMoreBtn.addEventListener('click', () => {
+            loadAnalysisHistory(state.historyPagination.currentPage + 1, true);
+        });
+        
+        historyContainer.appendChild(loadMoreBtn);
+    }
 }
     /**
      * Format a date for display
