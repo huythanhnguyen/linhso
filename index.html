@@ -320,12 +320,37 @@
     <div class="overlay" id="overlay"></div>
 
     <!-- Templates -->
-    <template id="bot-message-template">
-        <div class="message bot-message">
-            <div class="message-content"></div>
-            <div class="analysis-data hidden"></div>
-            
-              </template>
+    <!-- Cập nhật template cho tin nhắn bot -->
+<template id="bot-message-template">
+    <div class="message bot-message">
+        <div class="message-content"></div>
+        <div class="analysis-data hidden"></div>
+        
+        <!-- Phần hiển thị câu hỏi mẫu -->
+        <div class="suggestion-text hidden">
+            <p>Bạn có thể hỏi thêm về:</p>
+        </div>
+        <div class="question-examples hidden"></div>
+        
+        <!-- Suggestion chips -->
+        <div class="suggestion-chips hidden">
+            <button class="category-btn" data-category="business">
+                <i class="fas fa-briefcase"></i> Kinh doanh
+            </button>
+            <button class="category-btn" data-category="love">
+                <i class="fas fa-heart"></i> Tình duyên
+            </button>
+            <button class="category-btn" data-category="wealth">
+                <i class="fas fa-coins"></i> Tài lộc
+            </button>
+            <button class="category-btn" data-category="health">
+                <i class="fas fa-heartbeat"></i> Sức khỏe
+            </button>
+        </div>
+        
+  
+    </div>
+</template>
 
     <template id="user-message-template">
         <div class="message user-message">

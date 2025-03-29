@@ -1517,3 +1517,149 @@ header p {
     max-width: 80%;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
+/* Quick Buttons styling */
+.quick-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.quick-btn {
+    background-color: #f0f2f5;
+    color: var(--primary-color);
+    border: 1px solid #e0e0e0;
+    border-radius: 18px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-btn:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.quick-btn:active {
+    transform: translateY(0);
+}
+
+.quick-btn i {
+    margin-right: 5px;
+    font-size: 14px;
+}
+/* CSS cho câu hỏi mẫu */
+.suggestion-text {
+    margin-top: 16px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.question-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.example-question-btn {
+    background-color: var(--background-color, #f5f7fa);
+    color: var(--text-secondary, #6c757d);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.example-question-btn:hover {
+    background-color: var(--primary-light, #e7ecfd);
+    color: var(--primary-color, #4361ee);
+    border-color: var(--primary-color, #4361ee);
+}
+
+/* CSS bổ sung cho phần hiển thị câu hỏi mẫu */
+.suggestion-text {
+    margin-top: 16px;
+    font-size: 0.9rem;
+    color: #666;
+    /* Đảm bảo không bị ẩn khi đã remove class hidden */
+    display: block !important; 
+}
+
+.question-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.example-question-btn {
+    background-color: var(--primary-light, #e7ecfd);
+    color: var(--primary-color, #4361ee);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.example-question-btn:hover {
+    background-color: var(--primary-color, #4361ee);
+    color: white;
+    border-color: var(--primary-color, #4361ee);
+}
+
+/* Đảm bảo các phần tử không hiển thị khi còn class hidden */
+.suggestion-text.hidden,
+.question-examples.hidden,
+.suggestion-chips.hidden {
+    display: none !important;
+}
+
+/* Làm nổi bật hơn phần quick buttons */
+.quick-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 5px 0;
+}
+
+.quick-btn {
+    background-color: #f0f2f5;
+    color: var(--primary-color);
+    border: 1px solid #e0e0e0;
+    border-radius: 18px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-btn:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}

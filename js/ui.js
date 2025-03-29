@@ -834,50 +834,79 @@ function formatBotMessage(text) {
     return formattedText;
 }
     
-    /**
-     * Add a bot message to the chat
-     * @param {string} text - Message content
-     * @param {object} analysisData - Optional analysis data
-     * @returns {string} Message ID
-     */
-    function addBotMessage(text, analysisData = null) {
-        const chatMessages = document.getElementById('chat-messages');
-        const botMessageTemplate = document.getElementById('bot-message-template');
+
+/**
+ * Add a bot message to the chat
+ * @param {string} text - Message content
+ * @param {object} analysisData - Optional analysis data
+ * @returns {string} Message ID
+ */
+function addBotMessage(text, analysisData = null) {
+    const chatMessages = document.getElementById('chat-messages');
+    const botMessageTemplate = document.getElementById('bot-message-template');
+    
+    if (!chatMessages || !botMessageTemplate) {
+        debug('Cannot add bot message - missing DOM elements');
+        return null;
+    }
+
+    try {
+        const messageId = `msg_bot_${Date.now()}`;
+        const messageElement = botMessageTemplate.content.cloneNode(true);
+        const messageDiv = messageElement.querySelector('.message');
         
-        if (!chatMessages || !botMessageTemplate) {
-            debug('Cannot add bot message - missing DOM elements');
+        if (!messageDiv) {
+            debug('Cannot add bot message - template structure issue');
             return null;
         }
-
-        try {
-            const messageId = `msg_bot_${Date.now()}`;
-            const messageElement = botMessageTemplate.content.cloneNode(true);
-            const messageDiv = messageElement.querySelector('.message');
+        
+        messageDiv.id = messageId;
+        
+        const messageContentDiv = messageDiv.querySelector('.message-content');
+        if (messageContentDiv) {
+            const formattedText = formatBotMessage(text);
+            messageContentDiv.innerHTML = formattedText;
+        }
+        
+        // Add feedback buttons (nếu có)
+        const feedbackButtons = messageDiv.querySelector('.feedback-buttons');
+        if (feedbackButtons) {
+            feedbackButtons.classList.remove('hidden');
+        }
+        
+        if (analysisData) {
+            // Lấy dữ liệu phân tích (sử dụng result nếu có)
+            const data = analysisData.result || analysisData;
             
-            if (!messageDiv) {
-                debug('Cannot add bot message - template structure issue');
-                return null;
+            // Hiển thị các câu hỏi mẫu - SỬA LỖI TẠI ĐÂY
+            // Lấy phần tử suggestion-text và question-examples từ template thay vì tạo mới
+            const suggestionTextElem = messageDiv.querySelector('.suggestion-text');
+            const questionContainer = messageDiv.querySelector('.question-examples');
+            
+            // Bỏ class hidden để hiển thị các phần tử này
+            if (suggestionTextElem) suggestionTextElem.classList.remove('hidden');
+            if (questionContainer) questionContainer.classList.remove('hidden');
+            
+            // Tạo danh sách câu hỏi mẫu
+            const questionExamples = [
+                "Số này ảnh hưởng thế nào đến sự nghiệp của tôi?",
+                "Mối quan hệ với người khác có tốt không?", 
+                "Số này có phải là số may mắn không?",
+                "Tôi có nên giữ số điện thoại này không?",
+                "Cặp sao cuối thể hiện gì?",
+                "Số nào ảnh hưởng nhiều nhất đến tình duyên?"
+            ];
+            
+            // Thêm câu hỏi động
+            if (data.balance === 'HUNG_HEAVY') {
+                questionExamples.push("Làm thế nào để hóa giải sao hung?");
             }
             
-            messageDiv.id = messageId;
-            
-            const messageContentDiv = messageDiv.querySelector('.message-content');
-            if (messageContentDiv) {
-                const formattedText = formatBotMessage(text);
-                messageContentDiv.innerHTML = formattedText;
-            }
-            
-            // Add feedback buttons
-            const feedbackButtons = messageDiv.querySelector('.feedback-buttons');
-            if (feedbackButtons) {
-                feedbackButtons.classList.remove('hidden');
-            }
-            
-            if (analysisData) {
+            // Xóa nội dung cũ trong container câu hỏi để tránh trùng lặp
+            if (questionContainer) {
+                questionContainer.innerHTML = '';
                 
-                const exampleContainer = document.createElement('div');
-                exampleContainer.className = 'question-examples';
-                
+                // Thêm các nút câu hỏi mẫu
                 questionExamples.forEach(q => {
                     const exampleBtn = document.createElement('button');
                     exampleBtn.className = 'example-question-btn';
@@ -889,31 +918,92 @@ function formatBotMessage(text) {
                             userInput.focus();
                         }
                     });
-                    exampleContainer.appendChild(exampleBtn);
+                    questionContainer.appendChild(exampleBtn);
                 });
-                
-                messageDiv.appendChild(exampleContainer);
-                
-                // Lưu phân tích hiện tại
-                state.currentAnalysis = analysisData;
-                
-                // Cải thiện hiển thị phân tích
-                setTimeout(() => {
-                    enhanceAnalysisDisplay(analysisData);
-                    enhanceSuggestions();
-                }, 100);
             }
             
-            chatMessages.appendChild(messageElement);
-            scrollToBottom();
+            // Hiển thị các nút gợi ý chính (business, love, etc.)
+            const suggestionChips = messageDiv.querySelector('.suggestion-chips');
+            if (suggestionChips) {
+                suggestionChips.classList.remove('hidden');
+            }
             
-            return messageId;
-        } catch (error) {
-            debug('Error adding bot message:', error);
-            return null;
+            // Thêm các nút nhấn nhanh động dựa trên phân tích
+            const quickButtonsContainer = document.createElement('div');
+            quickButtonsContainer.className = 'quick-buttons';
+            
+            // Tạo mảng các nút
+            const buttonData = [
+                { text: 'Sự nghiệp', icon: 'fa-briefcase', question: 'Số điện thoại này ảnh hưởng thế nào đến sự nghiệp?' },
+                { text: 'Tài lộc', icon: 'fa-coins', question: 'Số điện thoại này có ý nghĩa gì về tài chính?' },
+                { text: 'Tình duyên', icon: 'fa-heart', question: 'Số điện thoại này nói gì về tình duyên của tôi?' },
+                { text: 'Sức khỏe', icon: 'fa-heartbeat', question: 'Số điện thoại này ảnh hưởng thế nào đến sức khỏe?' }
+            ];
+            
+            // Thêm nút theo cân bằng
+            if (data.balance === 'CAT_HEAVY') {
+                buttonData.push({
+                    text: 'Điểm mạnh',
+                    icon: 'fa-star',
+                    question: 'Điểm mạnh nổi bật của số điện thoại này là gì?'
+                });
+            } else if (data.balance === 'HUNG_HEAVY') {
+                buttonData.push({
+                    text: 'Điểm cần lưu ý',
+                    icon: 'fa-exclamation-circle',
+                    question: 'Những điểm cần lưu ý của số điện thoại này là gì?'
+                });
+            }
+            
+            // Thêm nút nên giữ số này
+            buttonData.push({
+                text: 'Nên giữ số này?',
+                icon: 'fa-question-circle',
+                question: 'Tôi có nên giữ số điện thoại này không?'
+            });
+            
+            // Tạo các nút từ dữ liệu
+            buttonData.forEach(button => {
+                const buttonElement = document.createElement('button');
+                buttonElement.className = 'quick-btn';
+                buttonElement.innerHTML = `<i class="fas ${button.icon}"></i> ${button.text}`;
+                
+                // Thêm sự kiện click
+                buttonElement.addEventListener('click', () => {
+                    // Thêm tin nhắn người dùng
+                    addUserMessage(button.question);
+                    
+                    // Xử lý câu hỏi
+                    if (typeof Chat !== 'undefined' && Chat && typeof Chat.processUserInput === 'function') {
+                        Chat.processUserInput(button.question);
+                    }
+                });
+                
+                quickButtonsContainer.appendChild(buttonElement);
+            });
+            
+            // Thêm container vào tin nhắn
+            messageDiv.appendChild(quickButtonsContainer);
+            
+            // Lưu phân tích hiện tại
+            state.currentAnalysis = analysisData;
+            
+            // Cải thiện hiển thị phân tích
+            setTimeout(() => {
+                enhanceAnalysisDisplay(analysisData);
+                enhanceSuggestions();
+            }, 100);
         }
+        
+        chatMessages.appendChild(messageElement);
+        scrollToBottom();
+        
+        return messageId;
+    } catch (error) {
+        debug('Error adding bot message:', error);
+        return null;
     }
-    
+}
     function formatAnalysisData(data) {
         const analysisElement = document.getElementById('analysis-container-template').content.cloneNode(true);
         const container = analysisElement.querySelector('.analysis-container');
@@ -1085,8 +1175,8 @@ function formatBotMessage(text) {
             chatMessages.innerHTML = '';
             
             // Add welcome message
-            addBotMessage('Xin chào! Tôi là trợ lý phân tích số điện thoại theo phương pháp Tứ Cát Tứ Hung. Bạn có thể nhập số điện thoại để tôi phân tích hoặc đặt câu hỏi về ý nghĩa các con số.');
-        }
+            addBotMessage('Xin chào! Tôi  phân tích số điện thoại theo phương pháp Bát Cực Linh Số. Bạn có thể nhập số điện thoại để tôi phân tích hoặc đặt câu hỏi về ý nghĩa các con số.');
+        } 
         
         // Reset current analysis
         state.currentAnalysis = null;
