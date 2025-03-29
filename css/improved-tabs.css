@@ -364,3 +364,57 @@
         50% { opacity: 1; transform: scale(1.2); }
         100% { opacity: 0.4; transform: scale(1); }
     }
+/* Đảm bảo chat input luôn hiển thị dưới cùng trên tất cả các thiết bị */
+.chat-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 75vh; /* giữ nguyên chiều cao */
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 80px; /* thêm padding để không bị chat-input che nội dung */
+}
+
+.chat-input {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-md) var(--space-lg);
+    background-color: #f9f9f9;
+    border-top: 1px solid var(--border-color);
+    z-index: 20;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Sửa lỗi đặc biệt cho laptop */
+@media (min-width: 992px) {
+    .chat-panel {
+        min-height: 500px;
+        max-height: 73vh;
+    }
+    
+    .chat-messages {
+        height: auto !important;
+        /* Đảm bảo chiều cao đúng để có không gian cho chat-input */
+        max-height: calc(75vh - 100px);
+    }
+    
+    .chat-input {
+        bottom: 0;
+        padding-bottom: calc(var(--space-md) + 5px);
+    }
+}
+
+/* Fix cho trình duyệt Safari */
+@supports (-webkit-touch-callout: none) {
+    .chat-input {
+        /* Tính toán lại padding bottom cho iOS để tránh bị thanh home indicator che */
+        padding-bottom: max(var(--space-md), calc(var(--space-md) + env(safe-area-inset-bottom, 0px)));
+    }
+}
