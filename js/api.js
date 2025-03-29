@@ -247,9 +247,94 @@ const API = (function() {
      * Get analysis history
      * @returns {Promise} Analysis history
      */
-    async function getAnalysisHistory() {
-        return await request(CONFIG.ANALYSIS.HISTORY, 'GET');
+  /**
+ * Get analysis history with detailed error handling and logging
+ * @param {number} limit - Optional limit for number of records to retrieve
+ * @param {number} page - Optional page number for pagination
+ * @returns {Promise} Analysis history object with data property containing records
+ */
+async function getAnalysisHistory(limit = 20, page = 1) {
+    try {
+        // Tạo query parameters nếu có
+        const queryParams = new URLSearchParams();
+        if (limit) queryParams.append('limit', limit);
+        if (page) queryParams.append('page', page);
+        
+        const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+        const endpoint = `${CONFIG.ANALYSIS.HISTORY}${queryString}`;
+        
+        // Kiểm tra xác thực trước khi gọi API
+        const token = getAuthToken();
+        if (!token) {
+            console.warn('Attempting to get history without authentication token');
+            return { success: false, message: 'Chưa đăng nhập', data: [] };
+        }
+        
+        console.log('Calling API to get analysis history...');
+        const response = await request(endpoint, 'GET');
+        console.log('Analysis history API response:', response);
+        
+        // Kiểm tra định dạng dữ liệu phản hồi
+        if (!response) {
+            console.error('Empty response from history API');
+            return { success: false, message: 'Không nhận được dữ liệu từ server', data: [] };
+        }
+        
+        // Đảm bảo response có định dạng chuẩn
+        if (!response.success && !response.data) {
+            console.warn('Response from history API is missing success or data properties:', response);
+            
+            // Cố gắng bình thường hóa dữ liệu
+            if (Array.isArray(response)) {
+                // Nếu response là mảng, giả định đó là dữ liệu
+                return { success: true, data: response };
+            } else {
+                // Nếu response là object nhưng không có data, bọc nó
+                return { 
+                    success: response.success !== false, 
+                    message: response.message || 'Định dạng dữ liệu không đúng', 
+                    data: response.data || []
+                };
+            }
+        }
+        
+        // Kiểm tra xem phản hồi có thành công không
+        if (response.success === false) {
+            console.warn('Failed to retrieve history:', response.message);
+            return response; // Trả về response nguyên bản
+        }
+        
+        // Kiểm tra xem data có phải mảng không
+        if (response.data && !Array.isArray(response.data)) {
+            console.warn('History data is not an array:', response.data);
+            return { 
+                success: true, 
+                message: 'Dữ liệu lịch sử không đúng định dạng',
+                data: []
+            };
+        }
+        
+        // Log thông tin chi tiết nếu có dữ liệu
+        if (response.data && response.data.length > 0) {
+            console.log(`Retrieved ${response.data.length} history items`);
+            console.log('First history item sample:', response.data[0]);
+        } else {
+            console.log('History is empty');
+        }
+        
+        return response;
+    } catch (error) {
+        console.error('Error retrieving analysis history:', error);
+        
+        // Đảm bảo trả về object có cấu trúc nhất quán trong trường hợp lỗi
+        return {
+            success: false,
+            message: error.message || 'Lỗi khi lấy lịch sử phân tích',
+            error: error.toString(),
+            data: []
+        };
     }
+}
     
     /**
      * Delete analysis history

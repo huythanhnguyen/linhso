@@ -53,20 +53,34 @@ window.UI = {};
                 debug('Not loading history - user not authenticated');
                 return;
             }
-
+    
             const historyContainer = document.getElementById('analysis-history');
             if (historyContainer) {
                 // Hiển thị thông báo đang tải
                 historyContainer.innerHTML = '<div class="empty-history-message">Đang tải lịch sử...</div>';
             }
-
-            const historyResponse = await API.getAnalysisHistory();
-            state.analysisHistory = historyResponse.data || [];
+    
+            // Gọi hàm API mới với tham số (giới hạn 20 mục lịch sử)
+            const historyResponse = await API.getAnalysisHistory(20, 1);
             
+            // Kiểm tra kết quả
+            if (!historyResponse.success) {
+                debug('Error loading history:', historyResponse.message);
+                if (historyContainer) {
+                    historyContainer.innerHTML = `<div class="empty-history-message">Không thể tải lịch sử: ${historyResponse.message}</div>`;
+                }
+                return;
+            }
+            
+            // Cập nhật state với dữ liệu lịch sử
+            state.analysisHistory = historyResponse.data || [];
+            debug(`Loaded ${state.analysisHistory.length} history items`);
+            
+            // Hiển thị lịch sử
             renderAnalysisHistory();
             
         } catch (error) {
-            debug('Error loading history:', error);
+            debug('Error in loadAnalysisHistory:', error);
             const historyContainer = document.getElementById('analysis-history');
             if (historyContainer) {
                 historyContainer.innerHTML = '<div class="empty-history-message">Không thể tải lịch sử. Vui lòng thử lại sau.</div>';
@@ -233,6 +247,11 @@ window.UI = {};
         const targetContent = document.getElementById(`${tabName}-tab`);
         if (targetContent) {
             targetContent.classList.add('active');
+        }
+        
+        // Tải lại lịch sử nếu tab là history và người dùng đã đăng nhập
+        if (tabName === 'history' && isAuthenticated()) {
+            loadAnalysisHistory();
         }
     }
     

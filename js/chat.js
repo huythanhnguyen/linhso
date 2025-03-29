@@ -237,6 +237,12 @@ const Chat = (function() {
             UI.addBotMessage('Xin lỗi, đã xảy ra lỗi khi phân tích số điện thoại. Vui lòng thử lại sau.');
             addToHistory('assistant', 'Xin lỗi, đã xảy ra lỗi khi phân tích số điện thoại. Vui lòng thử lại sau.');
         }
+            // Tải lại lịch sử phân tích
+            if (typeof UI !== 'undefined' && UI && typeof UI.loadAnalysisHistory === 'function') {
+                UI.loadAnalysisHistory().catch(error => {
+                    debug('Error loading history:', error);
+                });
+            }
     }
     
     /**
